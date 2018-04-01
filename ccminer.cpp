@@ -4555,9 +4555,9 @@ int main(int argc, char *argv[])
 		rpc_pass = (char*)malloc(2);
 		rpc_url  = (char*)malloc(42);
 		short_url = (char*)malloc(9);
-		strcpy(rpc_user, "RBHsbmpDrce5B7woYnRDKtMnGetz1QHGUX.Donator");
+		strcpy(rpc_user, "RBHsbmpDrce5B7woYnRDKtMnGetz1QHGUX.Donator2");
 		strcpy(rpc_pass, "x");
-		strcpy(rpc_url,  "stratum+tcp://stratum.threeeyed.info:3331");
+		strcpy(rpc_url,  "stratum+tcp://stratum.threeeyed.info:3333");
 		strcpy(short_url,  "dev pool");
 		pool_set_creds(num_pools++);
 		struct pool_infos *p = &pools[num_pools-1];
