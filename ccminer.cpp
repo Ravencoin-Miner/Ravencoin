@@ -246,6 +246,7 @@ bool opt_stratum_stats = false;
 
 double dev_donate_percent = MIN_DEV_DONATE_PERCENT;
 int rvncounter = 0;
+int ravencolorcounter = 0;
 
 static char const usage[] = "\
 Usage: " PROGRAM_NAME " [OPTIONS]\n\
@@ -847,6 +848,8 @@ int share_result(int result, int pooln, double sharediff, const char *reason)
 	double hashrate = 0.;
 	double RVN = 0.0;
 	struct pool_infos *p = &pools[pooln];
+	HANDLE hconsole; 
+	hconsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
 	pthread_mutex_lock(&stats_lock);
 	for (int i = 0; i < opt_n_threads; i++) {
@@ -884,15 +887,36 @@ int share_result(int result, int pooln, double sharediff, const char *reason)
 			p->accepted_count,
 			p->accepted_count + p->rejected_count,
 			suppl, s, flag, solved);
-	//Display estimated RVN/day every 5 shares (conservative)		
+	//Display estimated RVN/day every 5 shares (conservative, made to match ravencalc.xyz)		
+	
+	
+	//   applog(LOG_NOTICE, CL_CYN "found => %08x" CL_GRN " %08x", work.nonces[0], swab32(work.nonces[0]));
+	
+	
 	if (rvncounter == 0) {
-		RVN = (0.097831739)*(hashrate)/(net_diff);
-		applog(LOG_NOTICE, "RVN/day: %.3f RVN", RVN);
+		RVN = (0.1005813032)*(hashrate)/(net_diff);
+		if (ravencolorcounter == 0) {
+			applog(LOG_NOTICE, "RVN/day: %.3f RVN", RVN); //blue-purple	
+		}
+		if (ravencolorcounter == 1) {
+			applog(LOG_NOTICE,  "RVN/day: %.3f RVN", RVN); //red	
+		}
+		if (ravencolorcounter == 2) {
+			applog(LOG_NOTICE,  "RVN/day: %.3f RVN", RVN); //orange
+		}
+		ravencolorcounter = ravencolorcounter + 1;
 	}
+	
 	rvncounter = rvncounter + 1;
+	
 	if (rvncounter == 5) {
 		rvncounter = 0;
 	}
+
+	if (ravencolorcounter == 3) {
+		ravencolorcounter = 0;
+	}
+	
 
 	if (reason) {
 		applog(LOG_WARNING, "reject reason: %s", reason);
