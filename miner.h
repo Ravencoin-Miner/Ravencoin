@@ -595,6 +595,11 @@ void cuda_clear_lasterror();
 #define CL_MAG  "\x1B[35m"
 #define CL_CYN  "\x1B[36m"
 
+//#define CL_RVNBLUE      "\x1B[38;2;56;65;130mTRUECOLOR" //Ravencoin Blue
+//#define CL_RVNRED       "\x1B[38;2;240;82;57mTRUECOLOR" //Ravencoin Red
+//#define CL_RVNORANGE    "\x1B[38;2;247;148;51mTRUECOLOR" //Ravencoin Orange
+
+
 #define CL_BLK  "\x1B[22;30m" /* black */
 #define CL_RD2  "\x1B[22;31m" /* red */
 #define CL_GR2  "\x1B[22;32m" /* green */
