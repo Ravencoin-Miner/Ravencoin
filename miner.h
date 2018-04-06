@@ -595,21 +595,13 @@ void cuda_clear_lasterror();
 #define CL_MAG  "\x1B[35m"
 #define CL_CYN  "\x1B[36m"
 
-//#define CL_RVNBLUE      "\x1B[38;2;56;65;130m" //Ravencoin Blue
-//#define CL_RVNRED       "\x1B[38;2;240;82;57m" //Ravencoin Red
-//#define CL_RVNORANGE    "\x1B[38;2;247;148;51m" //Ravencoin Orange
-
-#define CL_RVNBLUE1      "\x1B[38;5;63m" //Ravencoin Blue
-#define CL_RVNRED1       "\x1B[38;5;196m" //Ravencoin Red
-#define CL_RVNORANGE1    "\x1B[38;5;208m" //Ravencoin Orange
-
 
 #define CL_BLK  "\x1B[22;30m" /* black */
-#define CL_RD2  "\x1B[22;31m" /* red */
-#define CL_GR2  "\x1B[22;32m" /* green */
-#define CL_YL2  "\x1B[22;33m" /* dark yellow */
+#define CL_RD2  "\x1B[22;31m" /* red */    //Can use for RVNRED = CL_RD2, must change CMD color dark red to (240,82,57)  	-Ravencoin Red 
+#define CL_GR2  "\x1B[22;32m" /* green */   //Can use for RVNORANGE = CL_YL2 must change CMD color dark green to (247,148,51) 	-Ravencoin Orange  
+#define CL_YL2  "\x1B[22;33m" /* dark yellow */ 
 #define CL_BL2  "\x1B[22;34m" /* blue */
-#define CL_MA2  "\x1B[22;35m" /* magenta */
+#define CL_MA2  "\x1B[22;35m" /* magenta */  //Can use for RVNBLUE = CL_MA2 must change CMD color dark magenta to (56,65,130)   	-Ravencoin Blue 
 #define CL_CY2  "\x1B[22;36m" /* cyan */
 #define CL_SIL  "\x1B[22;37m" /* gray */
 
