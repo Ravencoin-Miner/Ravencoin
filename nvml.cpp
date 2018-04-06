@@ -2253,11 +2253,11 @@ void *monitor_thread(void *userdata)
 				khs_per_watt = khs_per_watt / ((double)power / counter);
 				format_hashrate(khs_per_watt * 1000, khw);
 				if (strlen(khw))
-					sprintf(&khw[strlen(khw)-1], "W %uW ", cgpu->monitor.gpu_power / 1000);
+					sprintf(&khw[strlen(khw)-1], "W Power: %uW ", cgpu->monitor.gpu_power / 1000); //POWER:
 			}
 
 			if (opt_hwmonitor && (time(NULL) - cgpu->monitor.tm_displayed) > 60) {
-				gpulog(LOG_INFO, thr_id, "%s",
+				gpulog(LOG_INFO, thr_id, "Efficiency: %s", //Efficiency: 
 					/*cgpu->monitor.gpu_clock, cgpu->monitor.gpu_memclock,*/
 					khw/*, cgpu->monitor.gpu_temp, cgpu->monitor.gpu_fan*/
 				);
