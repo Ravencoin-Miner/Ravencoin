@@ -57,7 +57,7 @@
 BOOL WINAPI ConsoleHandler(DWORD);
 #endif
 
-#define PROGRAM_NAME		"nevermore"
+#define PROGRAM_NAME		"Ravencoin Miner"
 #define LP_SCANTIME		60
 #define HEAVYCOIN_BLKHDR_SZ		84
 #define MNR_BLKHDR_SZ 80
@@ -886,20 +886,30 @@ int share_result(int result, int pooln, double sharediff, const char *reason)
 			p->accepted_count,
 			p->accepted_count + p->rejected_count,
 			suppl, s, flag, solved);
-	//Display estimated RVN/day every 5 shares (conservative, made to match ravencalc.xyz)			
+			
+	/* 
+	-Display estimated RVN/day every 5 shares (conservative, made to match ravencalc.xyz)		
+	-Can color RVN/day by editing default CMD window colors
+	-Color definitions are in miner.h
+	-Ravencoin Blue (56,65,130)
+	-Ravencoin Red (240,82,57)
+	-Ravencoin Orange (247,148,51)
+	*/
+	
 	if (rvncounter == 0) {
 		RVN = (0.1005813032)*(hashrate)/(net_diff);
 		if (ravencolorcounter == 0) {
-			applog(LOG_NOTICE,   "RVN/day: %.3f RVN", RVN); //blue-purple	
+			applog(LOG_NOTICE, /* CL_MA2 */ "RVN/day: %.3f RVN", RVN); //blue-purple	
 		}
 		if (ravencolorcounter == 1) {
-			applog(LOG_NOTICE,    "RVN/day: %.3f RVN", RVN); //red	
+			applog(LOG_NOTICE, /* CL_RD2 */ "RVN/day: %.3f RVN", RVN); //red	
 		}
 		if (ravencolorcounter == 2) {
-			applog(LOG_NOTICE,   "RVN/day: %.3f RVN", RVN); //orange
+			applog(LOG_NOTICE, /* CL_GR2 */ "RVN/day: %.3f RVN", RVN); //orange
 		}
 		ravencolorcounter = ravencolorcounter + 1;
 	}
+	
 	
 	rvncounter = rvncounter + 1;
 	
