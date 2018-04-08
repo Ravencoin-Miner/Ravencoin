@@ -900,16 +900,16 @@ int share_result(int result, int pooln, double sharediff, const char *reason)
 		RVN = (0.1005813032)*(hashrate)/(net_diff);
 		ravencolorcounter = rand() % 3;
 		if (ravencolorcounter == 0) {
-			applog(LOG_NOTICE,  CL_MA2  "RVN/day: %.3f RVN", RVN); //blue-purple	
+			applog(LOG_NOTICE,  /*CL_MA2*/  "RVN/day: %.3f RVN", RVN); //blue-purple	
 		}
 		if (ravencolorcounter == 1) {
-			applog(LOG_NOTICE,  CL_RD2  "RVN/day: %.3f RVN", RVN); //red	
+			applog(LOG_NOTICE,  /*CL_RD2*/  "RVN/day: %.3f RVN", RVN); //red	
 		}
 		if (ravencolorcounter == 2) {
-			applog(LOG_NOTICE,  CL_GR2  "RVN/day: %.3f RVN", RVN); //orange
+			applog(LOG_NOTICE,  /*CL_GR2*/  "RVN/day: %.3f RVN", RVN); //orange
 		}
 		if (ravencolorcounter != 0 && ravencolorcounter != 1 && ravencolorcounter != 2) {
-			applog(LOG_NOTICE,  CL_MA2  "RVN/day: %.3f RVN", RVN); //orange
+			applog(LOG_NOTICE,  /*CL_MA2*/  "RVN/day: %.3f RVN", RVN); //orange
 		}
 	}
 	
