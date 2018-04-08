@@ -10,7 +10,7 @@
 #define __LDG_PTR   "r"
 #endif
 
-#include "cuda_helper_alexis.h"
+#include "cuda_helper.h"
 
 #if __CUDA_ARCH__ < 320 && !defined(__ldg4)
 #define __ldg4(x) (*(x))

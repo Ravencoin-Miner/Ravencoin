@@ -254,12 +254,18 @@ void x13_fugue512_gpu_hash_64_alexis(uint32_t threads, uint64_t *g_hash)
 
 		uint32_t Hash[16];
 
-		*(uint2x4*)&Hash[0] = __ldg4((uint2x4*)&hash[0]);
-		*(uint2x4*)&Hash[8] = __ldg4((uint2x4*)&hash[8]);
+		
+        #pragma unroll 16
+        for(int i = 0; i < 16; i++)
+                Hash[i] = cuda_swab32(Hash[i]);
 
-		#pragma unroll 16
-		for(int i = 0; i < 16; i++)
-			Hash[i] = cuda_swab32(Hash[i]);
+/*		
+		*(uint2x4*)&Hash[0] = __ldg4((uint2x4*)&hash[0]);
+		*(uint2x4*)&Hash[8] = __ldg4((uint2x4*)&hash[8]);		
+*/		
+
+*(uint2x4*)&Hash[0] = swapvec(__ldg4((uint2x4*)&hash[0]));
+*(uint2x4*)&Hash[8] = swapvec(__ldg4((uint2x4*)&hash[8]));
 
 		__syncthreads();
 
@@ -299,11 +305,13 @@ void x13_fugue512_gpu_hash_64_alexis(uint32_t threads, uint64_t *g_hash)
 		}
 		S[ 4] ^= S[ 0];	S[ 9] ^= S[ 0];	S[18] ^= S[ 0];	S[27] ^= S[ 0];
 
+		
 		S[ 0] = cuda_swab32(S[ 1]);	S[ 1] = cuda_swab32(S[ 2]);	S[ 2] = cuda_swab32(S[ 3]);	S[ 3] = cuda_swab32(S[ 4]);
 		S[ 4] = cuda_swab32(S[ 9]);	S[ 5] = cuda_swab32(S[10]);	S[ 6] = cuda_swab32(S[11]);	S[ 7] = cuda_swab32(S[12]);
 		S[ 8] = cuda_swab32(S[18]);	S[ 9] = cuda_swab32(S[19]);	S[10] = cuda_swab32(S[20]);	S[11] = cuda_swab32(S[21]);
 		S[12] = cuda_swab32(S[27]);	S[13] = cuda_swab32(S[28]);	S[14] = cuda_swab32(S[29]);	S[15] = cuda_swab32(S[30]);
 
+		
 		*(uint2x4*)&hash[ 0] = *(uint2x4*)&S[ 0];
 		*(uint2x4*)&hash[ 8] = *(uint2x4*)&S[ 8];
 	}

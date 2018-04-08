@@ -2,7 +2,7 @@
  * Shabal-512 for X14/X15
  * Provos Alexis - 2016
  */
-#include "cuda_helper_alexis.h"
+#include "cuda_helper.h"
 #include "cuda_vectors_alexis.h"
 
 /* $Id: shabal.c 175 2010-05-07 16:03:20Z tp $ */

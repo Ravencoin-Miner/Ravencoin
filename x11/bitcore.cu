@@ -278,10 +278,10 @@ extern "C" int scanhash_bitcore(int thr_id, struct work* work, uint32_t max_nonc
 		quark_bmw512_cpu_init(thr_id, throughput);
 		quark_groestl512_cpu_init(thr_id, throughput);
 		quark_skein512_cpu_init(thr_id, throughput);
-		quark_keccak512_cpu_init(thr_id, throughput);
+		//quark_keccak512_cpu_init(thr_id, throughput);
 		quark_jh512_cpu_init(thr_id, throughput);
 		x11_luffa512_cpu_init(thr_id, throughput);
-		x11_cubehash512_cpu_init(thr_id, throughput);
+		//x11_cubehash512_cpu_init(thr_id, throughput);
 		x11_shavite512_cpu_init(thr_id, throughput);
 		if (x11_simd512_cpu_init(thr_id, throughput) != 0) {
 			return 0;
@@ -346,7 +346,8 @@ extern "C" int scanhash_bitcore(int thr_id, struct work* work, uint32_t max_nonc
 				TRACE("jh512  :");
 				break;
 			case KECCAK:
-				quark_keccak512_cpu_hash_64(thr_id, throughput, pdata[19], NULL, d_hash[thr_id], i);
+				//quark_keccak512_cpu_hash_64(thr_id, throughput, pdata[19], NULL, d_hash[thr_id], i);
+				quark_keccak512_cpu_hash_64(thr_id, throughput, NULL, d_hash[thr_id]); i++;
 				TRACE("keccak :");
 				break;
 			case LUFFA:
@@ -354,7 +355,7 @@ extern "C" int scanhash_bitcore(int thr_id, struct work* work, uint32_t max_nonc
 				TRACE("luffa  :");
 				break;
 			case CUBEHASH:
-				x11_cubehash512_cpu_hash_64(thr_id, throughput, pdata[19], NULL, d_hash[thr_id], i);
+				x11_cubehash512_cpu_hash_64(thr_id, throughput, d_hash[thr_id]); i++;
 				TRACE("cube   :");
 				break;
 			case SHAVITE:

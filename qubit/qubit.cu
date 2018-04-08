@@ -82,7 +82,7 @@ extern "C" int scanhash_qubit(int thr_id, struct work* work, uint32_t max_nonce,
 		gpulog(LOG_INFO, thr_id, "Intensity set to %g, %u cuda threads", throughput2intensity(throughput), throughput);
 
 		qubit_luffa512_cpu_init(thr_id, throughput);
-		x11_cubehash512_cpu_init(thr_id, throughput);
+		//x11_cubehash512_cpu_init(thr_id, throughput);
 		x11_shavite512_cpu_init(thr_id, throughput);
 		x11_simd512_cpu_init(thr_id, throughput);
 		x11_echo512_cpu_init(thr_id, throughput);
@@ -105,7 +105,7 @@ extern "C" int scanhash_qubit(int thr_id, struct work* work, uint32_t max_nonce,
 
 		// Hash with CUDA
 		qubit_luffa512_cpu_hash_80(thr_id, throughput, pdata[19], d_hash[thr_id], order++);
-		x11_cubehash512_cpu_hash_64(thr_id, throughput, pdata[19], NULL, d_hash[thr_id], order++);
+		x11_cubehash512_cpu_hash_64(thr_id, throughput, d_hash[thr_id]); order++;
 		x11_shavite512_cpu_hash_64(thr_id, throughput, pdata[19], NULL, d_hash[thr_id], order++);
 		x11_simd512_cpu_hash_64(thr_id, throughput, pdata[19], NULL, d_hash[thr_id], order++);
 		x11_echo512_cpu_hash_64(thr_id, throughput, pdata[19], NULL, d_hash[thr_id], order++);

@@ -2,7 +2,7 @@
  * Copyright 2010 Jeff Garzik
  * Copyright 2012-2014 pooler
  * Copyright 2014-2017 tpruvot
- * Copyright 2018      brianmct
+ * Copyright 2018      --Banshee
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -898,18 +898,20 @@ int share_result(int result, int pooln, double sharediff, const char *reason)
 	
 	if (rvncounter == 0) {
 		RVN = (0.1005813032)*(hashrate)/(net_diff);
+		ravencolorcounter = rand() % 3;
 		if (ravencolorcounter == 0) {
-			applog(LOG_NOTICE, /* CL_MA2 */ "RVN/day: %.3f RVN", RVN); //blue-purple	
+			applog(LOG_NOTICE,  CL_MA2  "RVN/day: %.3f RVN", RVN); //blue-purple	
 		}
 		if (ravencolorcounter == 1) {
-			applog(LOG_NOTICE, /* CL_RD2 */ "RVN/day: %.3f RVN", RVN); //red	
+			applog(LOG_NOTICE,  CL_RD2  "RVN/day: %.3f RVN", RVN); //red	
 		}
 		if (ravencolorcounter == 2) {
-			applog(LOG_NOTICE, /* CL_GR2 */ "RVN/day: %.3f RVN", RVN); //orange
+			applog(LOG_NOTICE,  CL_GR2  "RVN/day: %.3f RVN", RVN); //orange
 		}
-		ravencolorcounter = ravencolorcounter + 1;
+		if (ravencolorcounter != 0 && ravencolorcounter != 1 && ravencolorcounter != 2) {
+			applog(LOG_NOTICE,  CL_MA2  "RVN/day: %.3f RVN", RVN); //orange
+		}
 	}
-	
 	
 	rvncounter = rvncounter + 1;
 	
@@ -917,10 +919,6 @@ int share_result(int result, int pooln, double sharediff, const char *reason)
 		rvncounter = 0;
 	}
 
-	if (ravencolorcounter == 3) {
-		ravencolorcounter = 0;
-	}
-	
 
 	if (reason) {
 		applog(LOG_WARNING, "reject reason: %s", reason);

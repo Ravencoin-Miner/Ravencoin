@@ -40,6 +40,14 @@ extern void cudaReportHardwareFailure(int thr_id, cudaError_t error, const char*
 extern __device__ __device_builtin__ void __syncthreads(void);
 extern __device__ __device_builtin__ void __threadfence(void);
 
+
+#define AS_U32(addr)   *((uint32_t*)(addr))
+#define AS_U64(addr)   *((uint64_t*)(addr))
+#define AS_UINT2(addr) *((uint2*)(addr))
+#define AS_UINT4(addr) *((uint4*)(addr))
+#define AS_UL2(addr)   *((ulonglong2*)(addr))
+
+
 #ifndef __CUDA_ARCH__
 // define blockDim and threadIdx for host
 extern const dim3 blockDim;
@@ -66,22 +74,6 @@ extern const uint3 threadIdx;
 // #define SPH_T64(x) ((x) & SPH_C64(0xFFFFFFFFFFFFFFFF))
 #endif
 
-#if __CUDA_ARCH__ < 320
-// Host and Compute 3.0
-#define ROTL32(x, n) SPH_T32(((x) << (n)) | ((x) >> (32 - (n))))
-#define ROTR32(x, n) (((x) >> (n)) | ((x) << (32 - (n))))
-#define __ldg(x) (*(x))
-#else
-// Compute 3.2+
-#define ROTL32(x, n) __funnelshift_l( (x), (x), (n) )
-#define ROTR32(x, n) __funnelshift_r( (x), (x), (n) )
-#endif
-
-#define AS_U32(addr)   *((uint32_t*)(addr))
-#define AS_U64(addr)   *((uint64_t*)(addr))
-#define AS_UINT2(addr) *((uint2*)(addr))
-#define AS_UINT4(addr) *((uint4*)(addr))
-#define AS_UL2(addr)   *((ulonglong2*)(addr))
 
 /*********************************************************************/
 // Macros to catch CUDA errors in CUDA runtime calls
