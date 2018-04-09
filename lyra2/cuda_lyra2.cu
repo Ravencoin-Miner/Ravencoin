@@ -1,3 +1,4 @@
+#if 0
 /**
  * Lyra2 (v1) cuda implementation based on djm34 work
  * tpruvot@github 2015, Nanashi 08/2016 (from 1.8-r2)
@@ -570,3 +571,4 @@ void lyra2_cpu_hash_32(int thr_id, uint32_t threads, uint32_t startNounce, uint6
 	else
 		lyra2_gpu_hash_32_sm2 <<< grid3, block3 >>> (threads, startNounce, d_hash);
 }
+#endif

@@ -10,7 +10,8 @@
 #define __LDG_PTR   "r"
 #endif
 
-#include "cuda_helper.h"
+//#include "cuda_helper.h"
+#include "cuda_helper_alexis.h"
 
 #if __CUDA_ARCH__ < 320 && !defined(__ldg4)
 #define __ldg4(x) (*(x))
@@ -213,6 +214,7 @@ static __forceinline__ __device__ uchar4 operator+ (uchar4 a, uchar4 b) { return
 static __forceinline__ __device__ uint4 operator+ (uint4 a, uint4 b) { return make_uint4(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w); }
 static __forceinline__ __device__ uint4 operator^ (uint4 a, uint4 b) { return make_uint4(a.x ^ b.x, a.y ^ b.y, a.z ^ b.z, a.w ^ b.w); }
 static __forceinline__ __device__ uint4 operator& (uint4 a, uint4 b) { return make_uint4(a.x & b.x, a.y & b.y, a.z & b.z, a.w & b.w); }
+static __forceinline__ __device__ uint4 operator| (uint4 a, uint4 b) { return make_uint4(a.x | b.x, a.y | b.y, a.z | b.z, a.w | b.w); } // added for a1_min3r
 static __forceinline__ __device__ uint4 operator>>(uint4 a, int b) { return make_uint4(a.x >> b, a.y >> b, a.z >> b, a.w >> b); }
 static __forceinline__ __device__ uint4 operator<<(uint4 a, int b) { return make_uint4(a.x << b, a.y << b, a.z << b, a.w << b); }
 static __forceinline__ __device__ uint4 operator* (uint4 a, int b) { return make_uint4(a.x * b, a.y * b, a.z * b, a.w * b); }
@@ -415,13 +417,13 @@ static __forceinline__ __device__ uint2x4 rotate2x4(const uint2x4 &vec4, uint32_
 	uint2x4 ret;
 	asm("shf.l.wrap.b32 %0, %1, %2, %3;" : "=r"(ret.x.x) : "r"(vec4.x.x), "r"(vec4.x.x), "r"(shift));
 	asm("shf.l.wrap.b32 %0, %1, %2, %3;" : "=r"(ret.x.y) : "r"(vec4.x.y), "r"(vec4.x.y), "r"(shift));
-
+		
 	asm("shf.l.wrap.b32 %0, %1, %2, %3;" : "=r"(ret.y.x) : "r"(vec4.y.x), "r"(vec4.y.x), "r"(shift));
 	asm("shf.l.wrap.b32 %0, %1, %2, %3;" : "=r"(ret.y.y) : "r"(vec4.y.y), "r"(vec4.y.y), "r"(shift));
-
+		
 	asm("shf.l.wrap.b32 %0, %1, %2, %3;" : "=r"(ret.z.x) : "r"(vec4.z.x), "r"(vec4.z.x), "r"(shift));
 	asm("shf.l.wrap.b32 %0, %1, %2, %3;" : "=r"(ret.z.y) : "r"(vec4.z.y), "r"(vec4.z.y), "r"(shift));
-
+		
 	asm("shf.l.wrap.b32 %0, %1, %2, %3;" : "=r"(ret.w.x) : "r"(vec4.w.x), "r"(vec4.w.x), "r"(shift));
 	asm("shf.l.wrap.b32 %0, %1, %2, %3;" : "=r"(ret.w.y) : "r"(vec4.w.y), "r"(vec4.w.y), "r"(shift));
 	return ret;
@@ -629,6 +631,36 @@ static __device__ __forceinline__ ulonglong4 shuffle4(ulonglong4 var, int lane)
 	return var;
 #endif
 }
+/*! EDIT
+#ifdef __CUDA_ARCH__
+__device__ __forceinline__
+uint32_t ROL8(const uint32_t a){
+    return __byte_perm(a, 0, 0x2103);
+}
 
+__device__ __forceinline__
+uint32_t ROR8(const uint32_t a){
+    return __byte_perm(a, 0, 0x0321);
+}
+
+__device__ __forceinline__
+uint32_t ROL16(const uint32_t a){
+    return __byte_perm(a, 0, 0x1032);
+}
+#else
+    #define ROL8(u)  ROTL32(u, 8)
+    #define ROR8(u)  ROTR32(u, 8)
+    #define ROL16(u) ROTL32(u,16)
+#endif
+*/
+
+static __inline__ __device__ uint2x4 make_uint2x4(uint2 s0, uint2 s1, uint2 s2, uint2 s3)
+{
+	uint2x4 t;
+	t.x = s0; t.y = s1; t.z = s2; t.w = s3;
+	return t;
+}
+
+/////////////////////////
 
 #endif // #ifndef CUDA_LYRA_VECTOR_H

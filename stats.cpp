@@ -69,7 +69,7 @@ double stats_get_speed(int thr_id, double def_speed)
 	while (i != tlastscans.rend() && records < opt_statsavg) {
 		if (!i->second.ignored)
 		if (thr_id == -1 || i->second.thr_id == thr_id) {
-			if (i->second.hashcount > 1000) {
+			if (i->second.hashcount > 100000) {//1000) {
 				speed += i->second.hashrate;
 				records++;
 				// applog(LOG_BLUE, "%d %x %.1f", thr_id, i->second.thr_id, i->second.hashrate);

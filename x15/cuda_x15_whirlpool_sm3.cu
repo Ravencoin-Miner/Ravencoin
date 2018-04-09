@@ -1,3 +1,4 @@
+
 /**
  * Whirlpool-512 CUDA implementation. (better for SM 3.0)
  *
@@ -35,7 +36,8 @@
 // don't change, used by shared mem fetch!
 #define threadsperblock 256
 
-#include <cuda_helper.h>
+#include "cuda_helper_alexis.h"
+//#include <cuda_helper.h>
 #include <miner.h>
 #include "cuda_whirlpool_tables.cuh"
 

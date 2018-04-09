@@ -2,7 +2,8 @@
  * Shabal-512 for X14/X15
  * Provos Alexis - 2016
  */
-#include "cuda_helper.h"
+//#include "cuda_helper.h"
+#include "cuda_helper_alexis.h"
 #include "cuda_vectors_alexis.h"
 
 /* $Id: shabal.c 175 2010-05-07 16:03:20Z tp $ */
@@ -45,7 +46,7 @@ __device__ __forceinline__ void PERM_ELT(uint32_t &xa0,const uint32_t xa1,uint32
 		#else
 			tmp = (xb2 & ~xb3) ^ xm;
 		#endif
-
+		
 		xa0 = ((xa0 ^ xc ^ (ROTL32(xa1, 15) * 5U)) * 3U) ^ xb1 ^ tmp;
 		xb0 = xor3x(0xFFFFFFFF, xa0, ROTL32(xb0, 1));
 }
@@ -120,7 +121,7 @@ void x14_shabal512_gpu_hash_64_alexis(uint32_t threads, uint32_t *g_hash){
 	if (thread < threads){
 
 		uint32_t *Hash = &g_hash[thread<<4];
-
+		
 		*(uint2x4*)&M[ 0] = __ldg4((uint2x4*)&Hash[ 0]);
 		*(uint2x4*)&M[ 8] = __ldg4((uint2x4*)&Hash[ 8]);
 
@@ -133,7 +134,7 @@ void x14_shabal512_gpu_hash_64_alexis(uint32_t threads, uint32_t *g_hash){
 		ADD_BLOCK(A,C);
 		*(uint16*)&C[ 0]-= *(uint16*)&M[ 0];
 //		SWAP_BC;
-
+		
 		M[ 0] = 0x80;
 		M[ 1] = M[ 2] = M[ 3] = M[ 4] = M[ 5] = M[ 6] = M[ 7] = M[ 8] = M[ 9] = M[10] = M[11] = M[12] = M[13] = M[14] = M[15] = 0;
 		C[ 0]+= M[ 0];
@@ -196,7 +197,7 @@ void x14_shabal512_gpu_hash_64_final_alexis(uint32_t threads,const uint32_t* __r
 	if (thread < threads){
 
 		const uint32_t *Hash = &g_hash[thread<<4];
-
+		
 		*(uint2x4*)&M[ 0] = __ldg4((uint2x4*)&Hash[ 0]);
 		*(uint2x4*)&M[ 8] = __ldg4((uint2x4*)&Hash[ 8]);
 
@@ -209,7 +210,7 @@ void x14_shabal512_gpu_hash_64_final_alexis(uint32_t threads,const uint32_t* __r
 		ADD_BLOCK(A,C);
 		*(uint16*)&C[ 0]-= *(uint16*)&M[ 0];
 //		SWAP_BC;
-
+		
 		M[ 0] = 0x80;
 		M[ 1] = M[ 2] = M[ 3] = M[ 4] = M[ 5] = M[ 6] = M[ 7] = M[ 8] = M[ 9] = M[10] = M[11] = M[12] = M[13] = M[14] = M[15] = 0;
 		C[ 0]+= M[ 0];
@@ -240,11 +241,11 @@ void x14_shabal512_gpu_hash_64_final_alexis(uint32_t threads,const uint32_t* __r
 		PERM_ELT(A[10], A[ 9], B[ 2], B[15], B[11], B[ 8], C[ 6], M[ 2]); PERM_ELT(A[11], A[10], B[ 3], B[ 0], B[12], B[ 9], C[ 5], M[ 3]);
 		PERM_ELT(A[ 0], A[11], B[ 4], B[ 1], B[13], B[10], C[ 4], M[ 4]); PERM_ELT(A[ 1], A[ 0], B[ 5], B[ 2], B[14], B[11], C[ 3], M[ 5]);
 		PERM_ELT(A[ 2], A[ 1], B[ 6], B[ 3], B[15], B[12], C[ 2], M[ 6]); PERM_ELT(A[ 3], A[ 2], B[ 7], B[ 4], B[ 0], B[13], C[ 1], M[ 7]);
-
+		
 		if(*(uint64_t*)&B[ 6] <= target){
 			uint32_t tmp = atomicExch(&resNonce[0], thread);
 			if (tmp != UINT32_MAX)
-				resNonce[1] = tmp;
+				resNonce[1] = tmp;		
 		}
 	}
 }

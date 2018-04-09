@@ -1,3 +1,4 @@
+#if 0
 /**
  * Tribus Algo for Denarius
  *
@@ -76,7 +77,7 @@ extern "C" int scanhash_tribus(int thr_id, struct work *work, uint32_t max_nonce
 		gpulog(LOG_INFO, thr_id, "Intensity set to %g, %u cuda threads", throughput2intensity(throughput), throughput);
 
 		quark_jh512_cpu_init(thr_id, throughput);
-		//quark_keccak512_cpu_init(thr_id, throughput);
+		quark_keccak512_cpu_init(thr_id, throughput);
 
 		cuda_get_arch(thr_id);
 		use_compat_kernels[thr_id] = (cuda_arch[dev_id] < 500);
@@ -105,8 +106,7 @@ extern "C" int scanhash_tribus(int thr_id, struct work *work, uint32_t max_nonce
 	do {
 		int order = 1;
 		jh512_cuda_hash_80(thr_id, throughput, pdata[19], d_hash[thr_id]);
-		//quark_keccak512_cpu_hash_64(thr_id, throughput, pdata[19], NULL, d_hash[thr_id], order++);
-		quark_keccak512_cpu_hash_64(thr_id, throughput, NULL, d_hash[thr_id]); order++;
+		quark_keccak512_cpu_hash_64(thr_id, throughput, pdata[19], NULL, d_hash[thr_id], order++);
 
 		if (use_compat_kernels[thr_id]) {
 			x11_echo512_cpu_hash_64(thr_id, throughput, pdata[19], NULL, d_hash[thr_id], order++);
@@ -183,3 +183,4 @@ extern "C" void free_tribus(int thr_id)
 
 	cudaDeviceSynchronize();
 }
+#endif

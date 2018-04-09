@@ -90,14 +90,14 @@ __global__
 #if __CUDA_ARCH__ > 500
 __launch_bounds__(256, 1)
 #endif
-void quark_blake512_gpu_hash_64_sp(uint32_t threads, uint32_t startNounce, uint32_t *const __restrict__ g_nonceVector, uint2* g_hash)
+void quark_blake512_gpu_hash_64_sp(uint32_t threads, uint2* g_hash)
 {
 	const uint32_t thread = (blockDim.x * blockIdx.x + threadIdx.x);
 
 	if (thread < threads)
 	{
-		const uint32_t nounce = (g_nonceVector != NULL) ? g_nonceVector[thread] : (startNounce + thread);
-		const uint32_t hashPosition = nounce - startNounce;
+//		const uint32_t nounce = (g_nonceVector != NULL) ? g_nonceVector[thread] : (startNounce + thread);
+		const uint32_t hashPosition = thread;//= nounce - startNounce;
 
 		uint2 msg[16];
 
@@ -652,12 +652,12 @@ __global__ void quark_blake512_gpu_hash_80_sp(uint32_t, uint32_t startNounce, ui
 #endif
 
 __host__
-void quark_blake512_cpu_hash_64_sp(uint32_t threads, uint32_t startNounce, uint32_t *d_nonceVector, uint32_t *d_outputHash)
+void quark_blake512_cpu_hash_64_sp(uint32_t threads, uint32_t *d_outputHash)
 {
 	const uint32_t threadsperblock = 32;
 	dim3 grid((threads + threadsperblock-1)/threadsperblock);
 	dim3 block(threadsperblock);
-	quark_blake512_gpu_hash_64_sp <<<grid, block>>>(threads, startNounce, d_nonceVector, (uint2*)d_outputHash);
+	quark_blake512_gpu_hash_64_sp <<<grid, block>>>(threads, (uint2*)d_outputHash);
 }
 
 __host__

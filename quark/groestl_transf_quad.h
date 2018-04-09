@@ -1,37 +1,37 @@
 /* File included in quark/groestl (quark/jha,nist5/X11+) and groest/myriad coins for SM 3+ */
 
-#define merge8(z,x,y)\
-	z=__byte_perm(x, y, 0x5140); \
+#define merge8(z,x,y) {\
+	z=__byte_perm(x, y, 0x5140); };
 
-#define SWAP8(x,y)\
+#define SWAP8(x,y) {\
 	x=__byte_perm(x, y, 0x5410); \
-	y=__byte_perm(x, y, 0x7632);
+	y=__byte_perm(x, y, 0x7632);};
 
-#define SWAP4(x,y)\
+#define SWAP4(x,y) {\
 	t = (y<<4); \
 	t = (x ^ t); \
 	t = 0xf0f0f0f0UL & t; \
 	x = (x ^ t); \
 	t=  t>>4;\
-	y=  y ^ t;
+	y=  y ^ t;};
 
-#define SWAP2(x,y)\
+#define SWAP2(x,y) {\
 	t = (y<<2); \
 	t = (x ^ t); \
 	t = 0xccccccccUL & t; \
 	x = (x ^ t); \
 	t=  t>>2;\
-	y=  y ^ t;
+	y=  y ^ t;};
 
-#define SWAP1(x,y)\
+#define SWAP1(x,y) {\
 	t = (y+y); \
 	t = (x ^ t); \
 	t = 0xaaaaaaaaUL & t; \
 	x = (x ^ t); \
 	t=  t>>1;\
-	y=  y ^ t;
+	y=  y ^ t;};
 
-
+ 
 __device__ __forceinline__
 void to_bitslice_quad(uint32_t *const __restrict__ input, uint32_t *const __restrict__ output)
 {

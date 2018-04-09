@@ -1,3 +1,4 @@
+#if 0
 /**
  * Fresh algorithm
  */
@@ -183,3 +184,4 @@ extern "C" void free_fresh(int thr_id)
 
 	cudaDeviceSynchronize();
 }
+#endif

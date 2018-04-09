@@ -1,3 +1,4 @@
+#if 0
 #include <memory.h>
 
 #include "cuda_helper.h"
@@ -311,3 +312,4 @@ void skein256_cpu_hash_32(int thr_id, uint32_t threads, uint32_t startNounce, ui
 	MyStreamSynchronize(NULL, order, thr_id);
 }
 
+#endif

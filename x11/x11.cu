@@ -1,3 +1,4 @@
+#if 0
 extern "C" {
 #include "sph/sph_blake.h"
 #include "sph/sph_bmw.h"
@@ -120,7 +121,7 @@ extern "C" int scanhash_x11(int thr_id, struct work* work, uint32_t max_nonce, u
 		quark_bmw512_cpu_init(thr_id, throughput);
 		quark_groestl512_cpu_init(thr_id, throughput);
 		quark_skein512_cpu_init(thr_id, throughput);
-		//quark_keccak512_cpu_init(thr_id, throughput);
+		quark_keccak512_cpu_init(thr_id, throughput);
 		quark_jh512_cpu_init(thr_id, throughput);
 		x11_luffaCubehash512_cpu_init(thr_id, throughput);
 		x11_shavite512_cpu_init(thr_id, throughput);
@@ -156,8 +157,7 @@ extern "C" int scanhash_x11(int thr_id, struct work* work, uint32_t max_nonce, u
 		TRACE("skein  :");
 		quark_jh512_cpu_hash_64(thr_id, throughput, pdata[19], NULL, d_hash[thr_id], order++);
 		TRACE("jh512  :");
-		//quark_keccak512_cpu_hash_64(thr_id, throughput, pdata[19], NULL, d_hash[thr_id], order++);
-		quark_keccak512_cpu_hash_64(thr_id, throughput, NULL, d_hash[thr_id]); order++;
+		quark_keccak512_cpu_hash_64(thr_id, throughput, pdata[19], NULL, d_hash[thr_id], order++);
 		TRACE("keccak :");
 		x11_luffaCubehash512_cpu_hash_64(thr_id, throughput, d_hash[thr_id], order++);
 		TRACE("luffa+c:");
@@ -232,3 +232,4 @@ extern "C" void free_x11(int thr_id)
 
 	cudaDeviceSynchronize();
 }
+#endif

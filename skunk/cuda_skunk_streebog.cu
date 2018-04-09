@@ -1,3 +1,4 @@
+#if 0
 /*
  * Streebog GOST R 34.10-2012 stripped CUDA implementation for final hash
  *
@@ -369,3 +370,4 @@ void skunk_cuda_streebog(int thr_id, uint32_t threads, uint32_t *d_hash, uint32_
 
 	skunk_streebog_gpu_final_64 <<< grid, block >>> ((uint64_t*)d_hash, d_resNonce);
 }
+#endif

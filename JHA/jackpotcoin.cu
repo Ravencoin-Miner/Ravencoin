@@ -1,3 +1,4 @@
+#if 0
 extern "C"
 {
 #include "sph/sph_keccak.h"
@@ -293,3 +294,4 @@ extern "C" void free_jackpot(int thr_id)
 
 	init[thr_id] = false;
 }
+#endif

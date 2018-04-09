@@ -1,21 +1,32 @@
 /*
  * Quick and dirty addition of Fugue-512 for X13
- *
+ * 
  * Built on cbuchner1's implementation, actual hashing code
  * heavily based on phm's sgminer
  *
- *
+ * 
  */
+
 #include "cuda_helper_alexis.h"
 #include "miner.h"
+
 #include "cuda_vectors_alexis.h"
+/*
+#include "miner.h"
+#include "cuda_helper_alexis.h"
+#undef ROL8
+#undef ROR8
+#undef ROL16
+#undef __CUDA_ARCH__
+#include "cuda_vectors_alexis.h"
+*/
 /*
  * X13 kernel implementation.
  *
  * ==========================(LICENSE BEGIN)============================
  *
  * Copyright (c) 2014-2016  phm, Provos Alexis
- *
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software", to deal in the Software without restriction, including
@@ -23,10 +34,10 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
@@ -254,21 +265,19 @@ void x13_fugue512_gpu_hash_64_alexis(uint32_t threads, uint64_t *g_hash)
 
 		uint32_t Hash[16];
 
-		
-        #pragma unroll 16
-        for(int i = 0; i < 16; i++)
-                Hash[i] = cuda_swab32(Hash[i]);
-
-/*		
 		*(uint2x4*)&Hash[0] = __ldg4((uint2x4*)&hash[0]);
-		*(uint2x4*)&Hash[8] = __ldg4((uint2x4*)&hash[8]);		
-*/		
+		*(uint2x4*)&Hash[8] = __ldg4((uint2x4*)&hash[8]);
 
-*(uint2x4*)&Hash[0] = swapvec(__ldg4((uint2x4*)&hash[0]));
-*(uint2x4*)&Hash[8] = swapvec(__ldg4((uint2x4*)&hash[8]));
+#pragma unroll 16
+		for(int i = 0; i < 16; i++)
+			Hash[i] = cuda_swab32(Hash[i]);
 
+/*! Check up on this stuff!
+		*(uint2x4*)&Hash[0] = swapvec(__ldg4((uint2x4*)&hash[0]));
+		*(uint2x4*)&Hash[8] = swapvec(__ldg4((uint2x4*)&hash[8]));
+*/
 		__syncthreads();
-
+		
 		S[ 0] = S[ 1] = S[ 2] = S[ 3] = S[ 4] = S[ 5] = S[ 6] = S[ 7] = S[ 8] = S[ 9] = S[10] = S[11] = S[12] = S[13] = S[14] = S[15] = S[16] = S[17] = S[18] = S[19] = 0;
 		*(uint2x4*)&S[20] = *(uint2x4*)&c_S[ 0];
 		*(uint2x4*)&S[28] = *(uint2x4*)&c_S[ 8];
@@ -305,7 +314,7 @@ void x13_fugue512_gpu_hash_64_alexis(uint32_t threads, uint64_t *g_hash)
 		}
 		S[ 4] ^= S[ 0];	S[ 9] ^= S[ 0];	S[18] ^= S[ 0];	S[27] ^= S[ 0];
 
-		
+
 		S[ 0] = cuda_swab32(S[ 1]);	S[ 1] = cuda_swab32(S[ 2]);	S[ 2] = cuda_swab32(S[ 3]);	S[ 3] = cuda_swab32(S[ 4]);
 		S[ 4] = cuda_swab32(S[ 9]);	S[ 5] = cuda_swab32(S[10]);	S[ 6] = cuda_swab32(S[11]);	S[ 7] = cuda_swab32(S[12]);
 		S[ 8] = cuda_swab32(S[18]);	S[ 9] = cuda_swab32(S[19]);	S[10] = cuda_swab32(S[20]);	S[11] = cuda_swab32(S[21]);
@@ -340,10 +349,10 @@ void x13_fugue512_gpu_hash_64_final_alexis(uint32_t threads,const uint32_t* __re
 		uint32_t S[36];
 		uint32_t B[ 9];
 		uint32_t Hash[16];
-
+		
 		*(uint2x4*)&Hash[0] = __ldg4((uint2x4*)&hash[0]);
 		*(uint2x4*)&Hash[8] = __ldg4((uint2x4*)&hash[8]);
-		__syncthreads();
+		__syncthreads();		
 		S[ 0] = S[ 1] = S[ 2] = S[ 3] = S[ 4] = S[ 5] = S[ 6] = S[ 7] = S[ 8] = S[ 9] = S[10] = S[11] = S[12] = S[13] = S[14] = S[15] = S[16] = S[17] = S[18] = S[19] = 0;
 		*(uint2x4*)&S[20] = *(uint2x4*)&c_S[ 0];
 		*(uint2x4*)&S[28] = *(uint2x4*)&c_S[ 8];
@@ -358,7 +367,7 @@ void x13_fugue512_gpu_hash_64_final_alexis(uint32_t threads,const uint32_t* __re
 		for (int i = 0; i < 32; i++){
 			mROR3;
 			CMIX36(S[ 0], S[ 1], S[ 2], S[ 4], S[ 5], S[ 6], S[18], S[19], S[20]);
-			SMIX_LDG(shared, S[ 0], S[ 1], S[ 2], S[ 3]);
+			SMIX_LDG(shared, S[ 0], S[ 1], S[ 2], S[ 3]);			
 		}
 		#pragma unroll
 		for (int i = 0; i < 12; i++) {
@@ -386,12 +395,12 @@ void x13_fugue512_gpu_hash_64_final_alexis(uint32_t threads,const uint32_t* __re
 		SMIX_LDG(shared, S[ 0], S[ 1], S[ 2], S[ 3]);
 
 		S[ 3] = cuda_swab32(S[3]);	S[ 4] = cuda_swab32(S[4]^S[ 0]);
-
+		
 		const uint64_t check = *(uint64_t*)&S[ 3];
 		if(check <= target){
 			uint32_t tmp = atomicExch(&resNonce[0], thread);
 			if (tmp != UINT32_MAX)
-				resNonce[1] = tmp;
+				resNonce[1] = tmp;		
 		}
 	}
 }

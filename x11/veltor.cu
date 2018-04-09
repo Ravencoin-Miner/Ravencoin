@@ -1,3 +1,4 @@
+#if 0
 extern "C" {
 #include "sph/sph_skein.h"
 #include "sph/sph_shavite.h"
@@ -195,3 +196,4 @@ extern "C" void free_veltor(int thr_id)
 
 	cudaDeviceSynchronize();
 }
+#endif

@@ -1,3 +1,4 @@
+#if 0
 /**
  * Lyra2 (v1) cuda implementation based on djm34 work
  * tpruvot@github 2015, Nanashi 08/2016 (from 1.8-r2)
@@ -971,3 +972,4 @@ uint32_t lyra2Z_cpu_hash_32(int thr_id, uint32_t threads, uint32_t startNounce, 
 
 	return result;
 }
+#endif

@@ -1,3 +1,4 @@
+#if 0
 /**
  * SKEIN512 80 + SHA256 64
  * by tpruvot@github - 2015
@@ -482,3 +483,4 @@ extern "C" void free_skeincoin(int thr_id)
 
 	cudaDeviceSynchronize();
 }
+#endif

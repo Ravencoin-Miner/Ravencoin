@@ -7,12 +7,19 @@
 #include <stdio.h>
 #include <memory.h>
 
-#include "cuda_helper.h"
+#include "cuda_helper_alexis.h"
+//#include "cuda_helper.h"
 
 extern __device__ __device_builtin__ void __threadfence_block(void);
 
-#include "../x11/cuda_x11_aes.cuh"
+//#include "../x11/cuda_x11_aes.cuh"
+#define INTENSIVE_GMF
+#include "../x11/cuda_x11_echo_aes.cuh"
 
+
+__constant__ static uint32_t c_PaddedMessage80[20];
+
+/*
 __device__ __forceinline__ void AES_2ROUND(const uint32_t* __restrict__ sharedMemory,
 	uint32_t &x0, uint32_t &x1, uint32_t &x2, uint32_t &x3,
 	uint32_t &k0)
@@ -31,13 +38,52 @@ __device__ __forceinline__ void AES_2ROUND(const uint32_t* __restrict__ sharedMe
 	k0++;
 }
 
+*/
+/*
+__device__ __forceinline__ void AES_2ROUND(
+	const uint32_t* __restrict__ sharedMemory,
+	uint32_t &x0, uint32_t &x1, uint32_t &x2, uint32_t &x3,
+	uint32_t &k0)
+{
+	uint32_t y0, y1, y2, y3;
+
+	aes_round(sharedMemory,
+		x0, x1, x2, x3,
+		k0,
+		y0, y1, y2, y3);
+
+	aes_round(sharedMemory,
+		y0, y1, y2, y3,
+		x0, x1, x2, x3);
+
+	// hier werden wir ein carry brauchen (oder auch nicht)
+	k0++;
+}
+*/
+
+__device__ __forceinline__ void AES_2ROUND(
+	const uint32_t* __restrict__ sharedMemory,
+	//	uint32_t &x0, uint32_t &x1, uint32_t &x2, uint32_t &x3,
+	uint4* x,
+	uint32_t &k0)
+{
+	uint32_t y0, y1, y2, y3;
+	aes_round(sharedMemory, x->x, x->y, x->z, x->w, k0, y0, y1, y2, y3);
+
+	aes_round(sharedMemory, y0, y1, y2, y3, x->x, x->y, x->z, x->w);
+
+	// hier werden wir ein carry brauchen (oder auch nicht)
+	k0++;
+}
+
 __device__
 static void echo_round(uint32_t* const sharedMemory, uint32_t *W, uint32_t &k0)
 {
 	// Big Sub Words
 	#pragma unroll 16
 	for (int idx = 0; idx < 16; idx++) {
-		AES_2ROUND(sharedMemory, W[(idx << 2) + 0], W[(idx << 2) + 1], W[(idx << 2) + 2], W[(idx << 2) + 3], k0);
+//		AES_2ROUND(sharedMemory, W[(idx << 2) + 0], W[(idx << 2) + 1], W[(idx << 2) + 2], W[(idx << 2) + 3], k0);
+		AES_2ROUND(sharedMemory, (uint4*)&W[(idx << 2) + 0], k0);
 	}
 
 	// Shift Rows
@@ -102,6 +148,73 @@ static void echo_round(uint32_t* const sharedMemory, uint32_t *W, uint32_t &k0)
 }
 
 __device__ __forceinline__
+void cuda_echo_round_80_a1_min3r(uint32_t *const __restrict__ sharedMemory, const uint32_t threads, const uint32_t startNonce, uint64_t *g_hash)
+{
+	const uint32_t thread = (blockDim.x * blockIdx.x + threadIdx.x);
+	uint32_t k0; // bitlen
+	uint32_t h[29]; // <= 127 bytes input
+	uint32_t hash[16]; // <= 127 bytes input
+	if (thread < threads)
+	{
+		uint32_t *Hash = (uint32_t *)&g_hash[thread << 3];
+		uint32_t nonce = startNonce + thread;
+
+		uint32_t *const __restrict__ data = &c_PaddedMessage80[0];
+//#pragma unroll 8
+//		for (int i = 0; i < 18; i += 2)
+//			AS_UINT2(&h[i]) = AS_UINT2(&data[i]);
+		*(uint2x4*)&h[0] = *(uint2x4*)&data[0];
+		*(uint2x4*)&h[8] = *(uint2x4*)&data[8];
+
+		AS_UINT2(&h[16]) = AS_UINT2(&data[16]);
+		h[18] = data[18];
+		h[19] = cuda_swab32(nonce);
+		h[20] = 0x80;
+		h[21] = h[22] = h[23] = h[24] = h[25] = h[26] = 0;
+		//((uint8_t*)h)[80] = 0x80;
+		//((uint8_t*)h)[128-17] = 0x02;
+		//((uint8_t*)h)[128-16] = 0x80;
+		//((uint8_t*)h)[128-15] = 0x02;
+		h[27] = 0x2000000;
+		h[28] = 0x280;
+		//h[29] = h[30] = h[31] = 0;
+
+		*(uint2x4*)&hash[0] = *(uint2x4*)&h[0];
+		*(uint2x4*)&hash[8] = *(uint2x4*)&h[8];
+		k0 = 640; // bitlen
+		uint32_t W[64];
+
+#pragma unroll 8
+		for (int i = 0; i < 32; i += 4) {
+			W[i] = 512; // L
+			W[i + 1] = 0; // H
+			W[i + 2] = 0; // X
+			W[i + 3] = 0;
+		}
+
+#pragma unroll
+		for (int i = 32; i < 61; i++) W[i] = h[i - 32];
+#pragma unroll
+		for (int i = 61; i < 64; i++) W[i] = 0;
+
+		for (int i = 0; i < 10; i++)
+			echo_round(sharedMemory, W, k0);
+
+#pragma unroll 4
+		for (int i = 0; i < 16; i += 4)
+		{
+			W[i] ^= W[32 + i] ^ 512;
+			W[i + 1] ^= W[32 + i + 1];
+			W[i + 2] ^= W[32 + i + 2];
+			W[i + 3] ^= W[32 + i + 3];
+		}
+		*(uint2x4*)&Hash[0] = *(uint2x4*)&hash[0] ^ *(uint2x4*)&W[0];
+		*(uint2x4*)&Hash[8] = *(uint2x4*)&hash[8] ^ *(uint2x4*)&W[8];
+
+	}
+}
+
+__device__ __forceinline__
 void cuda_echo_round_80(uint32_t *const __restrict__ sharedMemory, uint32_t *const __restrict__ data, const uint32_t nonce, uint32_t *hash)
 {
 	uint32_t h[29]; // <= 127 bytes input
@@ -152,7 +265,7 @@ void cuda_echo_round_80(uint32_t *const __restrict__ sharedMemory, uint32_t *con
 	for (int i = 0; i < 16; i += 2)
 		AS_UINT2(&hash[i]) = AS_UINT2(&Z[i]);
 }
-
+#if 0
 __device__ __forceinline__
 void echo_gpu_init(uint32_t *const __restrict__ sharedMemory)
 {
@@ -169,14 +282,13 @@ void echo_gpu_init(uint32_t *const __restrict__ sharedMemory)
 		sharedMemory[threadIdx.x + 64 * 2 + 768] = d_AES3[threadIdx.x + 64 * 2];
 	}
 }
+#endif
 
 __host__
 void x16_echo512_cuda_init(int thr_id, const uint32_t threads)
 {
 	aes_cpu_init(thr_id);
 }
-
-__constant__ static uint32_t c_PaddedMessage80[20];
 
 __host__
 void x16_echo512_setBlock_80(void *endiandata)
@@ -189,9 +301,10 @@ void x16_echo512_gpu_hash_80(uint32_t threads, uint32_t startNonce, uint64_t *g_
 {
 	__shared__ uint32_t sharedMemory[1024];
 
-	echo_gpu_init(sharedMemory);
+//	echo_gpu_init(sharedMemory);
+	aes_gpu_init_128(sharedMemory);
 	__threadfence_block();
-
+#if 0
 	const uint32_t thread = (blockDim.x * blockIdx.x + threadIdx.x);
 	if (thread < threads)
 	{
@@ -199,7 +312,12 @@ void x16_echo512_gpu_hash_80(uint32_t threads, uint32_t startNonce, uint64_t *g_
 		uint32_t *pHash = (uint32_t*)&g_hash[hashPosition<<3];
 
 		cuda_echo_round_80(sharedMemory, c_PaddedMessage80, startNonce + thread, pHash);
+//		cuda_echo_round_80_a1_min3r(sharedMemory, startNonce + thread, pHash);
 	}
+#else
+	//		cuda_echo_round_80(sharedMemory, c_PaddedMessage80, startNonce + thread, pHash);
+	cuda_echo_round_80_a1_min3r(sharedMemory, threads, startNonce, g_hash);
+#endif
 }
 
 __host__

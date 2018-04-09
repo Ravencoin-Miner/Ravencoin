@@ -1,3 +1,4 @@
+#if 0
 #include <string.h>
 #include <stdint.h>
 #include <cuda_runtime.h>
@@ -128,3 +129,4 @@ void free_myriad(int thr_id)
 
 	cudaDeviceSynchronize();
 }
+#endif

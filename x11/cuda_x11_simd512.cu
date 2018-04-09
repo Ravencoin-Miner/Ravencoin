@@ -662,14 +662,22 @@ __host__
 int x11_simd512_cpu_init(int thr_id, uint32_t threads)
 {
 	int dev_id = device_map[thr_id];
-	cuda_get_arch(thr_id);
+	// cuda_get_arch(thr_id); // should be already done!
 	if (device_sm[dev_id] < 300 || cuda_arch[dev_id] < 300) {
 		x11_simd512_cpu_init_sm2(thr_id);
 		return 0;
 	}
-
-	CUDA_CALL_OR_RET_X(cudaMalloc(&d_temp4[thr_id], 64*sizeof(uint4)*threads), (int) err); /* todo: prevent -i 21 */
-	CUDA_CALL_OR_RET_X(cudaMalloc(&d_state[thr_id], 32*sizeof(int)*threads), (int) err);
+	//2097152
+#if 0
+	if (threads > 2097152)
+	{
+		CUDA_CALL_OR_RET_X(cudaMalloc(&d_temp4[thr_id], 32 * sizeof(uint4)*(threads >> 1)), (int)err); /* todo: prevent -i 21 */
+		CUDA_CALL_OR_RET_X(cudaMalloc((&d_temp4[thr_id]) + 32 * (threads >> 1), 32 * sizeof(uint4)*(threads >> 1)), (int)err); /* todo: prevent -i 21 */
+	}
+	else
+#endif
+		CUDA_CALL_OR_RET_X(cudaMalloc(&d_temp4[thr_id], 64 * sizeof(uint4)*threads), (int)err); /* todo: prevent -i 21 */
+	CUDA_CALL_OR_RET_X(cudaMalloc(&d_state[thr_id], 32 * sizeof(int)*threads), (int)err);
 
 #ifndef DEVICE_DIRECT_CONSTANTS
 	cudaMemcpyToSymbol(c_perm, h_perm, sizeof(h_perm), 0, cudaMemcpyHostToDevice);
@@ -705,19 +713,14 @@ void x11_simd512_cpu_free(int thr_id)
 }
 
 __host__
-void x11_simd512_cpu_hash_64(int thr_id, uint32_t threads, uint32_t startNounce, uint32_t *d_nonceVector, uint32_t *d_hash, int order)
+void x11_simd512_cpu_hash_64(int thr_id, uint32_t threads, uint32_t *d_hash)
 {
 	const uint32_t threadsperblock = TPB;
 	int dev_id = device_map[thr_id];
-
+	//2097152
 	dim3 block(threadsperblock);
 	dim3 grid((threads + threadsperblock-1) / threadsperblock);
 	dim3 gridX8(grid.x * 8);
-
-	if (d_nonceVector != NULL || device_sm[dev_id] < 300 || cuda_arch[dev_id] < 300) {
-		x11_simd512_cpu_hash_64_sm2(thr_id, threads, startNounce, d_nonceVector, d_hash, order);
-		return;
-	}
 
 	x11_simd512_gpu_expand_64 <<<gridX8, block>>> (threads, d_hash, d_temp4[thr_id]);
 
@@ -730,5 +733,5 @@ void x11_simd512_cpu_hash_64(int thr_id, uint32_t threads, uint32_t startNounce,
 
 	x11_simd512_gpu_final_64 <<<grid, block>>> (threads, d_hash, d_temp4[thr_id], d_state[thr_id]);
 
-	//MyStreamSynchronize(NULL, order, thr_id);
+//	MyStreamSynchronize(NULL, order, thr_id);
 }

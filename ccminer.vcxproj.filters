@@ -512,12 +512,6 @@
     <ClInclude Include="lyra2\Sponge.h">
       <Filter>Header Files\lyra2</Filter>
     </ClInclude>
-    <ClInclude Include="quark\groestl_transf_quad.h">
-      <Filter>Source Files\CUDA\quark</Filter>
-    </ClInclude>
-    <ClInclude Include="quark\groestl_functions_quad.h">
-      <Filter>Source Files\CUDA\quark</Filter>
-    </ClInclude>
     <ClInclude Include="res\resource.h">
       <Filter>Ressources</Filter>
     </ClInclude>
@@ -605,6 +599,18 @@
     <ClInclude Include="x11\cuda_x11_aes_alexis.cuh">
       <Filter>Source Files\CUDA\x11</Filter>
     </ClInclude>
+    <ClInclude Include="x11\cuda_x11_echo_aes.cuh">
+      <Filter>Source Files\CUDA\x11</Filter>
+    </ClInclude>
+    <ClInclude Include="quark\groestl_simple.cuh" />
+    <ClInclude Include="quark\groestl_transf_quad.h">
+      <Filter>Source Files\CUDA\quark</Filter>
+    </ClInclude>
+    <ClInclude Include="quark\groestl_functions_quad.h">
+      <Filter>Source Files\CUDA\quark</Filter>
+    </ClInclude>
+    <ClInclude Include="quark\groestl_functions_quad_a1_min3r.cuh" />
+    <ClInclude Include="quark\groestl_transf_quad_a1_min3r.cuh" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="cuda.cpp">
@@ -1009,9 +1015,7 @@
     <CudaCompile Include="x13\cuda_x13_fugue512_alexis.cu">
       <Filter>Source Files\CUDA\x13</Filter>
     </CudaCompile>
-    <CudaCompile Include="x13\cuda_x13_hamsi512_alexis.cu">
-      <Filter>Source Files\CUDA\x13</Filter>
-    </CudaCompile>
+    <CudaCompile Include="x13\cuda_x13_hamsi512_alexis.cu" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\ccminer.ico">

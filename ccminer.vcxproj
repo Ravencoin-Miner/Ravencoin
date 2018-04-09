@@ -167,11 +167,10 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>Full</Optimization>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <EnableEnhancedInstructionSet>
-      </EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <OpenMPSupport>true</OpenMPSupport>
       <CompileAsManaged>false</CompileAsManaged>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -180,6 +179,12 @@
       <AdditionalIncludeDirectories>.;compat;compat\curl-for-windows\curl\include;compat\jansson;compat\getopt;compat\pthreads;compat\curl-for-windows\openssl\openssl\include;compat\curl-for-windows\zlib;%(AdditionalIncludeDirectories);$(CudaToolkitIncludeDir)</AdditionalIncludeDirectories>
       <MinimalRebuild>true</MinimalRebuild>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <SDLCheck>false</SDLCheck>
+      <OmitFramePointers>true</OmitFramePointers>
+      <StringPooling>true</StringPooling>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>false</GenerateDebugInformation>
@@ -192,10 +197,11 @@
       <AdditionalOptions>/NODEFAULTLIB:LIBCMT %(AdditionalOptions)</AdditionalOptions>
       <LinkStatus>false</LinkStatus>
       <LargeAddressAware>true</LargeAddressAware>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
     </Link>
     <CudaCompile>
       <CInterleavedPTX>false</CInterleavedPTX>
-      <MaxRegCount>80</MaxRegCount>
+      <MaxRegCount>128</MaxRegCount>
       <PtxAsOptionV>true</PtxAsOptionV>
       <Keep>true</Keep>
       <CodeGeneration>compute_61,sm_61;compute_52,sm_52;compute_50,sm_50</CodeGeneration>
@@ -203,6 +209,7 @@
       <Optimization>O3</Optimization>
       <TargetMachinePlatform>64</TargetMachinePlatform>
       <AdditionalOptions>--Wno-deprecated-gpu-targets %(AdditionalOptions)</AdditionalOptions>
+      <FastMath>true</FastMath>
     </CudaCompile>
     <CudaLink>
       <Optimization>O3</Optimization>
@@ -268,7 +275,11 @@
     <ClCompile Include="neoscrypt\neoscrypt.cpp" />
     <ClCompile Include="neoscrypt\neoscrypt-cpu.c" />
     <ClInclude Include="neoscrypt\cuda_vectors.h" />
+    <ClInclude Include="quark\groestl_functions_quad_a1_min3r.cuh" />
+    <ClInclude Include="quark\groestl_transf_quad_a1_min3r.cuh" />
+    <ClInclude Include="quark\groestl_simple.cuh" />
     <ClInclude Include="x11\cuda_x11_aes_alexis.cuh" />
+    <ClInclude Include="x11\cuda_x11_echo_aes.cuh" />
     <ClInclude Include="x11\cuda_x11_simd512_sm2.cuh" />
     <ClInclude Include="x16r\cuda_x16r.h" />
     <CudaCompile Include="Algo256\bmw.cu" />
@@ -440,7 +451,11 @@
     <CudaCompile Include="x11\cuda_x11_echo_alexis.cu" />
     <CudaCompile Include="x11\cuda_x11_shavite512_alexis.cu" />
     <CudaCompile Include="x13\cuda_x13_fugue512_alexis.cu" />
-    <CudaCompile Include="x13\cuda_x13_hamsi512_alexis.cu" />
+    <CudaCompile Include="x13\cuda_x13_hamsi512_alexis.cu">
+      <DeploymentContent>true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </DeploymentContent>
+    </CudaCompile>
     <CudaCompile Include="x15\cuda_x14_shabal512_alexis.cu" />
     <CudaCompile Include="x15\cuda_x15_whirlpool_sm3.cu" />
     <CudaCompile Include="x16r\x16r.cu" />
@@ -562,7 +577,6 @@
     <CudaCompile Include="tribus\tribus.cu" />
     <ClInclude Include="x11\cuda_x11_aes.cuh" />
     <CudaCompile Include="x11\cuda_x11_cubehash512.cu" />
-	<CudaCompile Include="x11\cuda_x11_cubehash512_80.cu" />
     <CudaCompile Include="x11\cuda_x11_echo.cu">
     </CudaCompile>
     <CudaCompile Include="x11\cuda_x11_luffa512.cu" />

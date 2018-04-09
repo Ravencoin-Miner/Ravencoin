@@ -1,3 +1,4 @@
+#if 0
 /**
  * SKEIN512 80 + SKEIN512 64 (Woodcoin)
  * by tpruvot@github - 2015
@@ -147,3 +148,4 @@ void free_skein2(int thr_id)
 
 	cudaDeviceSynchronize();
 }
+#endif

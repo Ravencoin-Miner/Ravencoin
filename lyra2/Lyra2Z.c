@@ -1,3 +1,4 @@
+#if 0
 /**
  * Implementation of the Lyra2 Password Hashing Scheme (PHS).
  *
@@ -213,3 +214,4 @@ int LYRA2Z(void *K, int64_t kLen, const void *pwd, int32_t pwdlen, const void *s
 	return 0;
 }
 
+#endif

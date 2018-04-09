@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <memory.h>
 
-#include "cuda_helper.h"
+#include "cuda_helper_alexis.h"
 
 extern __device__ __device_builtin__ void __threadfence_block(void);
 

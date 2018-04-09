@@ -1,3 +1,4 @@
+#if 0
 extern "C" {
 #include "sph/sph_blake.h"
 #include "sph/sph_groestl.h"
@@ -198,3 +199,4 @@ extern "C" void free_lyra2(int thr_id)
 
 	cudaDeviceSynchronize();
 }
+#endif

@@ -1,3 +1,4 @@
+#if 0
 #include <string.h>
 #include <stdint.h>
 #include <cuda_runtime.h>
@@ -112,3 +113,4 @@ void free_fugue256(int thr_id)
 
 	cudaDeviceSynchronize();
 }
+#endif

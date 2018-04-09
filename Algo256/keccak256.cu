@@ -1,3 +1,4 @@
+#if 0
 /*
  * Keccak 256
  *
@@ -173,3 +174,4 @@ extern "C" void free_keccak256(int thr_id)
 	cudaDeviceSynchronize();
 	init[thr_id] = false;
 }
+#endif

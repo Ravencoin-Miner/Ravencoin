@@ -1,11 +1,14 @@
+
 /* SKEIN 64 and 80 based on Alexis Provos version */
 
 #define TPB52 512
 #define TPB50 256
 
 #include <stdio.h>
-#include <cuda_vectors.h>
-#include <cuda_vector_uint2x4.h>
+#include "cuda_vectors_alexis.h"
+//#include "cuda_helper_alexis.h"
+//#include <cuda_vectors.h>
+//#include <cuda_vector_uint2x4.h>
 
 /* ************************ */
 
@@ -463,7 +466,7 @@ __launch_bounds__(TPB52, 3)
 #else
 __launch_bounds__(TPB50, 5)
 #endif
-void quark_skein512_gpu_hash_64(const uint32_t threads, const uint32_t startNonce, uint64_t* __restrict__ g_hash, const uint32_t *const __restrict__ g_nonceVector)
+void quark_skein512_gpu_hash_64(const uint32_t threads, uint64_t* __restrict__ g_hash)
 {
 	const uint32_t thread = (blockDim.x * blockIdx.x + threadIdx.x);
 
@@ -472,7 +475,7 @@ void quark_skein512_gpu_hash_64(const uint32_t threads, const uint32_t startNonc
 		// Skein
 		uint2 p[8], h[9];
 
-		const uint32_t hashPosition = (g_nonceVector == NULL) ? thread : g_nonceVector[thread] - startNonce;
+		const uint32_t hashPosition = thread;//= (g_nonceVector == NULL) ? thread : g_nonceVector[thread] - startNonce;
 
 		uint64_t *Hash = &g_hash[hashPosition<<3];
 
@@ -567,7 +570,7 @@ void quark_skein512_gpu_hash_64(const uint32_t threads, const uint32_t startNonc
 
 		uint2 hash64[8];
 
-		hash64[5] = h5 + 8;
+		hash64[5] = h5 + (uint32_t)8;
 
 		hash64[0] = h0 + h1;
 		hash64[1] = ROL2(h1, 46) ^ hash64[0];
@@ -606,47 +609,47 @@ void quark_skein512_gpu_hash_64(const uint32_t threads, const uint32_t startNonc
 		hash64[4]+= h5;
 		hash64[5]+= h6 + make_uint2(0,0xff000000);
 		hash64[6]+= h7 + vectorize(0xff00000000000008);
-		hash64[7]+= skein_h8 + 1;
+		hash64[7] += skein_h8 + (uint32_t)1;
 		macro3();
 		hash64[0]+= h2; hash64[1]+= h3; hash64[2]+= h4; hash64[3]+= h5;
 		hash64[4]+= h6;
 		hash64[5]+= h7 + vectorize(0xff00000000000008);
-		hash64[6]+= skein_h8 + 8;
-		hash64[7]+= h0 + 2;
+		hash64[6] += skein_h8 + (uint32_t)8;
+		hash64[7] += h0 + (uint32_t)2;
 		macro4();
 		hash64[0] = (hash64[0] + h3);			hash64[1] = (hash64[1] + h4);
 		hash64[2] = (hash64[2] + h5);			hash64[3] = (hash64[3] + h6);
-		hash64[4] = (hash64[4] + h7);			hash64[5] = (hash64[5] + skein_h8 + 8);
+		hash64[4] = (hash64[4] + h7);			hash64[5] = (hash64[5] + skein_h8 + (uint32_t)8);
 		hash64[6] = (hash64[6] + h0 + make_uint2(0,0xff000000));
-		hash64[7] = (hash64[7] + h1 + 3);
+		hash64[7] = (hash64[7] + h1 + (uint32_t)3);
 		macro3();
 		hash64[0] = (hash64[0] + h4);			hash64[1] = (hash64[1] + h5);
 		hash64[2] = (hash64[2] + h6);			hash64[3] = (hash64[3] + h7);
 		hash64[4] = (hash64[4] + skein_h8);		hash64[5] = (hash64[5] + h0 + make_uint2(0,0xff000000));
 		hash64[6] = (hash64[6] + h1 + vectorize(0xff00000000000008));
-		hash64[7] = (hash64[7] + h2 + 4);
+		hash64[7] = (hash64[7] + h2 + (uint32_t)4);
 		macro4();
 		hash64[0] = (hash64[0] + h5);			hash64[1] = (hash64[1] + h6);
 		hash64[2] = (hash64[2] + h7);			hash64[3] = (hash64[3] + skein_h8);
 		hash64[4] = (hash64[4] + h0);			hash64[5] = (hash64[5] + h1 + vectorize(0xff00000000000008));
-		hash64[6] = (hash64[6] + h2 + 8);		hash64[7] = (hash64[7] + h3 + 5);
+		hash64[6] = (hash64[6] + h2 + (uint32_t)8);		hash64[7] = (hash64[7] + h3 + (uint32_t)5);
 		macro3();
 		hash64[0] = (hash64[0] + h6);			hash64[1] = (hash64[1] + h7);
 		hash64[2] = (hash64[2] + skein_h8);		hash64[3] = (hash64[3] + h0);
-		hash64[4] = (hash64[4] + h1);			hash64[5] = (hash64[5] + h2 + 8);
+		hash64[4] = (hash64[4] + h1);			hash64[5] = (hash64[5] + h2 + (uint32_t)8);
 		hash64[6] = (hash64[6] + h3 + make_uint2(0,0xff000000));
-		hash64[7] = (hash64[7] + h4 + 6);
+		hash64[7] = (hash64[7] + h4 + (uint32_t)6);
 		macro4();
 		hash64[0] = (hash64[0] + h7);			hash64[1] = (hash64[1] + skein_h8);
 		hash64[2] = (hash64[2] + h0);			hash64[3] = (hash64[3] + h1);
 		hash64[4] = (hash64[4] + h2);			hash64[5] = (hash64[5] + h3 + make_uint2(0,0xff000000));
 		hash64[6] = (hash64[6] + h4 + vectorize(0xff00000000000008));
-		hash64[7] = (hash64[7] + h5 + 7);
+		hash64[7] = (hash64[7] + h5 + (uint32_t)7);
 		macro3();
 		hash64[0] = (hash64[0] + skein_h8);		hash64[1] = (hash64[1] + h0);
 		hash64[2] = (hash64[2] + h1);			hash64[3] = (hash64[3] + h2);
 		hash64[4] = (hash64[4] + h3);			hash64[5] = (hash64[5] + h4 + vectorize(0xff00000000000008));
-		hash64[6] = (hash64[6] + h5 + 8);		hash64[7] = (hash64[7] + h6 + 8);
+		hash64[6] = (hash64[6] + h5 + (uint32_t)8);		hash64[7] = (hash64[7] + h6 + (uint32_t)8);
 		macro4();
 		hash64[0] = vectorize(devectorize(hash64[0]) + devectorize(h0));
 		hash64[1] = vectorize(devectorize(hash64[1]) + devectorize(h1));
@@ -756,7 +759,7 @@ void quark_skein512_gpu_hash_64(const uint32_t threads, const uint32_t startNonc
 
 __host__
 //void quark_skein512_cpu_hash_64(int thr_id,uint32_t threads, uint32_t *d_nonceVector, uint32_t *d_hash)
-void quark_skein512_cpu_hash_64(int thr_id, const uint32_t threads, const uint32_t startNonce, uint32_t *d_nonceVector, uint32_t *d_hash, int order)
+void quark_skein512_cpu_hash_64(int thr_id, const uint32_t threads, uint32_t *d_hash)
 {
 	uint32_t tpb = TPB52;
 	int dev_id = device_map[thr_id];
@@ -764,7 +767,7 @@ void quark_skein512_cpu_hash_64(int thr_id, const uint32_t threads, const uint32
 	if (device_sm[dev_id] <= 500) tpb = TPB50;
 	const dim3 grid((threads + tpb-1)/tpb);
 	const dim3 block(tpb);
-	quark_skein512_gpu_hash_64 <<<grid, block >>>(threads, startNonce, (uint64_t*)d_hash, d_nonceVector);
+	quark_skein512_gpu_hash_64 <<<grid, block >>>(threads, (uint64_t*)d_hash);
 
 }
 
@@ -939,7 +942,7 @@ void skein512_gpu_hash_80(uint32_t threads, uint32_t startNounce, uint64_t *outp
 }
 
 __host__
-void skein512_cpu_hash_80(int thr_id, uint32_t threads, uint32_t startNounce, uint32_t *d_hash, int swap)
+void skein512_cpu_hash_80(int thr_id, uint32_t threads, uint32_t startNounce, uint32_t *d_hash) //, int swap)
 {
 	uint32_t tpb = TPB52;
 	int dev_id = device_map[thr_id];

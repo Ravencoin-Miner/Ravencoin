@@ -1,3 +1,4 @@
+#if 0
 #include <string.h>
 #include <stdint.h>
 #include <cuda_runtime.h>
@@ -111,3 +112,4 @@ void free_groestlcoin(int thr_id)
 
 	cudaDeviceSynchronize();
 }
+#endif

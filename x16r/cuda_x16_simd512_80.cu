@@ -4,8 +4,10 @@
  */
 
 #include <miner.h>
-#include <cuda_helper.h>
-#include <cuda_vectors.h>
+//#include <cuda_helper.h>
+//#include <cuda_vectors.h>
+#include "cuda_helper_alexis.h"
+#include "cuda_vectors_alexis.h"
 
 #ifdef __INTELLISENSE__
 /* just for vstudio code colors */

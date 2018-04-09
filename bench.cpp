@@ -1,3 +1,4 @@
+#if 0
 /**
  * Made to benchmark and test algo switch
  *
@@ -238,3 +239,4 @@ void bench_display_results()
 		}
 	}
 }
+#endif

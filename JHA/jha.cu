@@ -1,3 +1,4 @@
+#if 0
 /**
  * JHA v8 algorithm - compatible implementation
  * @author tpruvot@github 05-2017
@@ -263,3 +264,4 @@ extern "C" void free_jha(int thr_id)
 	cudaDeviceSynchronize();
 	init[thr_id] = false;
 }
+#endif

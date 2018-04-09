@@ -1,3 +1,4 @@
+
 /*
  * whirlpool routine
  */
@@ -69,7 +70,7 @@ void whirl_midstate(void *state, const void *input)
 }
 
 static bool init[MAX_GPUS] = { 0 };
-
+#if 0
 extern "C" int scanhash_whirl(int thr_id, struct work* work, uint32_t max_nonce, unsigned long *hashes_done)
 {
 	uint32_t _ALIGN(128) endiandata[20];
@@ -179,3 +180,4 @@ extern "C" void free_whirl(int thr_id)
 	cudaDeviceSynchronize();
 }
 
+#endif

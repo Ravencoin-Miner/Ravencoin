@@ -157,14 +157,14 @@ void Compression512_30(uint64_t *msg, uint64_t *hash)
 }
 
 __global__
-void quark_bmw512_gpu_hash_64_30(uint32_t threads, uint32_t startNounce, uint64_t *g_hash, uint32_t *g_nonceVector)
+void quark_bmw512_gpu_hash_64_30(uint32_t threads, uint64_t *g_hash)
 {
 	int thread = (blockDim.x * blockIdx.x + threadIdx.x);
 	if (thread < threads)
 	{
-		uint32_t nounce = (g_nonceVector != NULL) ? g_nonceVector[thread] : (startNounce + thread);
+		//uint32_t nounce = (g_nonceVector != NULL) ? g_nonceVector[thread] : (startNounce + thread);
 
-		uint32_t hashPosition = nounce - startNounce;
+		uint32_t hashPosition = thread;//= nounce - startNounce;
 		uint64_t *inpHash = &g_hash[hashPosition * 8];
 
 		// Init
@@ -265,7 +265,7 @@ void quark_bmw512_gpu_hash_80_30(uint32_t threads, uint32_t startNounce, uint64_
 }
 
 #else /* stripped stubs for other archs */
-__global__ void quark_bmw512_gpu_hash_64_30(uint32_t threads, uint32_t startNounce, uint64_t *g_hash, uint32_t *g_nonceVector) {}
+__global__ void quark_bmw512_gpu_hash_64_30(uint32_t threads, uint64_t *g_hash) {}
 __global__ void quark_bmw512_gpu_hash_80_30(uint32_t threads, uint32_t startNounce, uint64_t *g_hash) {}
 #endif
 

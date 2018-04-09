@@ -3,6 +3,7 @@
 	Provos Alexis - 2016
 */
 
+//#include "cuda_helper.h"
 #include "cuda_helper_alexis.h"
 #include "cuda_vectors_alexis.h"
 
@@ -34,7 +35,7 @@ static void echo_round_alexis(const uint32_t sharedMemory[4][256], uint32_t *W, 
 		W[i +40] = t[1];
 		W[i +56] = t[2];
 		W[i +44] = W[i +28];
-
+				
 		W[i +28] = W[i +12];
 		W[i +12] = t[3];
 		W[i +36] = W[i +52];
@@ -94,7 +95,7 @@ static void x11_echo512_gpu_hash_64_final_alexis(uint32_t threads, uint64_t *g_h
 	uint32_t h[16];
 
 	const uint32_t thread = (blockDim.x * blockIdx.x + threadIdx.x);
-
+	
 	if (thread < threads){
 
 		const uint32_t *hash = (uint32_t*)&g_hash[thread<<3];
@@ -207,7 +208,7 @@ static void x11_echo512_gpu_hash_64_final_alexis(uint32_t threads, uint64_t *g_h
 			W[48 + i + 8] = cdx ^ ab ^ d;
 			W[48 + i +12] = abx ^ bcx ^ cdx ^ ab ^ c;
 		}
-
+		
 		for (int k = 1; k < 9; k++)
 			echo_round_alexis(sharedMemory,W,k0);
 		// Big Sub Words
@@ -221,27 +222,27 @@ static void x11_echo512_gpu_hash_64_final_alexis(uint32_t threads, uint64_t *g_h
 //		AES_2ROUND(sharedMemory,W[ 8], W[ 9], W[10], W[11], k0);
 		aes_round(sharedMemory, W[ 8], W[ 9], W[10], W[11], k0, y0, y1, y2, y3);
 		aes_round(sharedMemory, y0, y1, y2, y3, W[ 8], W[ 9], W[10], W[11]);
-
+		
 //		AES_2ROUND(sharedMemory,W[20], W[21], W[22], W[23], k0);
 		aes_round(sharedMemory, W[20], W[21], W[22], W[23], k0, y0, y1, y2, y3);
 		aes_round(sharedMemory, y0, y1, y2, y3, W[20], W[21], W[22], W[23]);
 //		AES_2ROUND(sharedMemory,W[28], W[29], W[30], W[31], k0);
 		aes_round(sharedMemory, W[28], W[29], W[30], W[31], k0, y0, y1, y2, y3);
 		aes_round(sharedMemory, y0, y1, y2, y3, W[28], W[29], W[30], W[31]);
-
+		
 //		AES_2ROUND(sharedMemory,W[32], W[33], W[34], W[35], k0);
 		aes_round(sharedMemory, W[32], W[33], W[34], W[35], k0, y0, y1, y2, y3);
 		aes_round(sharedMemory, y0, y1, y2, y3, W[32], W[33], W[34], W[35]);
 //		AES_2ROUND(sharedMemory,W[40], W[41], W[42], W[43], k0);
 		aes_round(sharedMemory, W[40], W[41], W[42], W[43], k0, y0, y1, y2, y3);
 		aes_round(sharedMemory, y0, y1, y2, y3, W[40], W[41], W[42], W[43]);
-
+		
 		aes_round(sharedMemory, W[52], W[53], W[54], W[55], k0, y0, y1, y2, y3);
 		aes_round(sharedMemory, y0, y1, y2, y3, W[52], W[53], W[54], W[55]);
 //		AES_2ROUND(sharedMemory,W[60], W[61], W[62], W[63], k0);
 		aes_round(sharedMemory, W[60], W[61], W[62], W[63], k0, y0, y1, y2, y3);
 		aes_round(sharedMemory, y0, y1, y2, y3, W[60], W[61], W[62], W[63]);
-
+		
 		uint32_t bc = W[22] ^ W[42];
 		uint32_t t2 = (bc & 0x80808080);
 		W[ 6] = (t2 >> 7) * 27U ^ ((bc^t2) << 1);
@@ -295,11 +296,11 @@ static void x11_echo512_gpu_hash_64_alexis(uint32_t threads, uint32_t *g_hash)
 
 		*(uint2x4*)&h[ 0] = __ldg4((uint2x4*)&Hash[ 0]);
 		*(uint2x4*)&h[ 8] = __ldg4((uint2x4*)&Hash[ 8]);
-
+		
 		*(uint2x4*)&hash[ 0] = *(uint2x4*)&h[ 0];
 		*(uint2x4*)&hash[ 8] = *(uint2x4*)&h[ 8];
-
-		__syncthreads();
+		
+//		__syncthreads();
 
 		const uint32_t P[48] = {
 			0xe7e9f5f5, 0xf5e7e9f5, 0xb3b36b23, 0xb3dbe7af, 0xa4213d7e, 0xf5e7e9f5, 0xb3b36b23, 0xb3dbe7af,

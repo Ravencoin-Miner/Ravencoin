@@ -537,9 +537,9 @@ void x11_simd512_gpu_hash_64_sm2(const uint32_t threads, const uint32_t startNou
 	const uint32_t thread = (blockDim.x * blockIdx.x + threadIdx.x);
 	if (thread < threads)
 	{
-		uint32_t nounce = (g_nonceVector != NULL) ? g_nonceVector[thread] : (startNounce + thread);
+		//uint32_t nounce = (g_nonceVector != NULL) ? g_nonceVector[thread] : (startNounce + thread);
 
-		const int hashPosition = nounce - startNounce;
+		const int hashPosition = thread;//nounce - startNounce;
 		uint32_t *Hash = (uint32_t*) &g_hash[8 * hashPosition];
 
 		SIMDHash(Hash, Hash);

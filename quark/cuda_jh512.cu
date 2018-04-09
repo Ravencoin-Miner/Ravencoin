@@ -3,7 +3,8 @@
  *
  * JH80 by tpruvot - 2017 - under GPLv3
  **/
-#include <cuda_helper.h>
+//#include <cuda_helper.h>
+#include "cuda_helper_alexis.h"
 
 // #include <stdio.h>  // printf
 // #include <unistd.h> // sleep
@@ -276,13 +277,13 @@ static void E8(uint32_t x[8][4])
 
 __global__
 //__launch_bounds__(256,2)
-void quark_jh512_gpu_hash_64(const uint32_t threads, const uint32_t startNounce, uint32_t* g_hash, uint32_t * g_nonceVector)
+void quark_jh512_gpu_hash_64(const uint32_t threads, uint32_t* g_hash)
 {
 	const uint32_t thread = (blockDim.x * blockIdx.x + threadIdx.x);
 	if (thread < threads)
 	{
-		const uint32_t nounce = (g_nonceVector != NULL) ? g_nonceVector[thread] : (startNounce + thread);
-		const uint32_t hashPosition = nounce - startNounce;
+		//const uint32_t nounce = (g_nonceVector != NULL) ? g_nonceVector[thread] : (startNounce + thread);
+		const uint32_t hashPosition = thread;//= nounce - startNounce;
 		uint32_t *Hash = &g_hash[(size_t)16 * hashPosition];
 
 		uint32_t h[16];
@@ -328,13 +329,13 @@ void quark_jh512_gpu_hash_64(const uint32_t threads, const uint32_t startNounce,
 }
 
 __host__
-void quark_jh512_cpu_hash_64(int thr_id, uint32_t threads, uint32_t startNounce, uint32_t *d_nonceVector, uint32_t *d_hash, int order)
+void quark_jh512_cpu_hash_64(int thr_id, uint32_t threads, uint32_t *d_hash)
 {
 	const uint32_t threadsperblock = 256;
 	dim3 grid((threads + threadsperblock-1)/threadsperblock);
 	dim3 block(threadsperblock);
 
-	quark_jh512_gpu_hash_64<<<grid, block>>>(threads, startNounce, d_hash, d_nonceVector);
+	quark_jh512_gpu_hash_64<<<grid, block>>>(threads, d_hash);
 }
 
 // Setup function

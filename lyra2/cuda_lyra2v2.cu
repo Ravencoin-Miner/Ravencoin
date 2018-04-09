@@ -1,3 +1,4 @@
+#if 0
 /**
  * Lyra2 (v2) CUDA Implementation
  *
@@ -467,3 +468,4 @@ void lyra2v2_cpu_hash_32(int thr_id, uint32_t threads, uint32_t startNounce, uin
 
 	}
 }
+#endif

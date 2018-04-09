@@ -1348,6 +1348,6 @@ void api_set_throughput(int thr_id, uint32_t throughput)
 		if (cgpu->throughput != throughput) cgpu->throughput = throughput;
 	}
 	// to display in bench results
-	if (opt_benchmark)
-		bench_set_throughput(thr_id, throughput);
+//	if (opt_benchmark)
+//		bench_set_throughput(thr_id, throughput);
 }

@@ -1,3 +1,4 @@
+#if 0
 /**
  * S3 Hash (Also called Triple S - Used by 1Coin)
  */
@@ -179,3 +180,4 @@ extern "C" void free_s3(int thr_id)
 
 	cudaDeviceSynchronize();
 }
+#endif

@@ -74,7 +74,6 @@ extern const uint3 threadIdx;
 // #define SPH_T64(x) ((x) & SPH_C64(0xFFFFFFFFFFFFFFFF))
 #endif
 
-
 /*********************************************************************/
 // Macros to catch CUDA errors in CUDA runtime calls
 
@@ -471,6 +470,20 @@ static __device__ __forceinline__ uint2 operator+ (const uint2 a,const uint2 b) 
 #endif
 }
 
+static __device__ __forceinline__ uint2 operator+ (const uint2 a, const uint32_t b)
+{
+#if 0 && defined(__CUDA_ARCH__) && CUDA_VERSION < 7000
+	uint2 result;
+	asm(
+		"add.cc.u32 %0,%2,%4; \n\t"
+		"addc.u32 %1,%3,%5;   \n\t"
+		: "=r"(result.x), "=r"(result.y) : "r"(a.x), "r"(a.y), "r"(b), "r"(0));
+	return result;
+#else
+	return vectorize(devectorize(a) + b);
+#endif
+}
+
 static __device__ __forceinline__ uint2 operator+ (const uint2 a,const uint64_t b) {
 	return vectorize(devectorize(a) + b);
 }
@@ -491,19 +504,6 @@ static __device__ __forceinline__ uint2 operator- (const uint2 a,const uint2 b) 
 #endif
 }
 static __device__ __forceinline__ void operator-= (uint2 &a,const uint2 b) { a = a - b; }
-
-static __device__ __forceinline__ uint2 operator+ (const uint2 a,const uint32_t b)
-{
-#if defined(__CUDA_ARCH__) && CUDA_VERSION < 7000
-	uint2 result;
-	asm("add.cc.u32 %0,%2,%4; \n\t"
-		"addc.u32 %1,%3,%5;   \n\t"
-		: "=r"(result.x), "=r"(result.y) : "r"(a.x), "r"(a.y), "r"(b), "r"(0));
-	return result;
-#else
-	return vectorize(devectorize(a) + b);
-#endif
-}
 
 static __device__ __forceinline__ uint2 operator- (const uint2 a,const uint64_t b) {
 	return vectorize(devectorize(a) - b);
@@ -717,5 +717,6 @@ uint32_t bfi(uint32_t x, uint32_t a, uint32_t bit, uint32_t numBits) {
 	asm("bfi.b32 %0, %1, %2, %3,%4;" : "=r"(ret) : "r"(x), "r"(a), "r"(bit), "r"(numBits));
 	return ret;
 }
+
 #endif // #ifndef CUDA_HELPER_H
 

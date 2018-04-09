@@ -129,7 +129,7 @@ void quark_groestl512_perm_Q(uint32_t *a, char *mixtabs)
 #endif
 
 __global__
-void quark_groestl512_gpu_hash_64(uint32_t threads, uint32_t startNounce, uint32_t *g_hash, uint32_t *g_nonceVector)
+void quark_groestl512_gpu_hash_64(uint32_t threads, uint32_t *g_hash)
 {
 #if __CUDA_ARCH__ < 300 || defined(_DEBUG)
 
@@ -155,9 +155,9 @@ void quark_groestl512_gpu_hash_64(uint32_t threads, uint32_t startNounce, uint32
 		uint32_t message[32];
 		uint32_t state[32];
 
-		uint32_t nounce = (g_nonceVector != NULL) ? g_nonceVector[thread] : (startNounce + thread);
+		//uint32_t nounce = (g_nonceVector != NULL) ? g_nonceVector[thread] : (startNounce + thread);
 
-		off_t hashPosition = nounce - startNounce;
+		off_t hashPosition = thread;//= nounce - startNounce;
 		uint32_t *pHash = &g_hash[hashPosition * 16];
 
 		#pragma unroll 4
@@ -244,16 +244,16 @@ void quark_groestl512_sm20_free(int thr_id)
 }
 
 __host__
-void quark_groestl512_sm20_hash_64(int thr_id, uint32_t threads, uint32_t startNounce, uint32_t *d_nonceVector, uint32_t *d_hash, int order)
+void quark_groestl512_sm20_hash_64(int thr_id, uint32_t threads, uint32_t *d_hash, int order)
 {
 	int threadsperblock = 512;
 
 	dim3 grid((threads + threadsperblock-1)/threadsperblock);
 	dim3 block(threadsperblock);
 
-	quark_groestl512_gpu_hash_64<<<grid, block>>>(threads, startNounce, d_hash, d_nonceVector);
+	quark_groestl512_gpu_hash_64<<<grid, block>>>(threads, d_hash);
 }
-
+/*
 __host__
 void quark_doublegroestl512_sm20_hash_64(int thr_id, uint32_t threads, uint32_t startNounce, uint32_t *d_nonceVector, uint32_t *d_hash, int order)
 {
@@ -265,7 +265,7 @@ void quark_doublegroestl512_sm20_hash_64(int thr_id, uint32_t threads, uint32_t 
 	quark_groestl512_gpu_hash_64<<<grid, block>>>(threads, startNounce, d_hash, d_nonceVector);
 	quark_groestl512_gpu_hash_64<<<grid, block>>>(threads, startNounce, d_hash, d_nonceVector);
 }
-
+*/
 // --------------------------------------------------------------------------------------------------------------------------------------------
 
 #ifdef WANT_GROESTL80

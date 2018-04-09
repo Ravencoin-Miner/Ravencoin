@@ -1,3 +1,4 @@
+#if 0
 //
 //
 //  PHI1612 algo
@@ -115,7 +116,7 @@ extern "C" int scanhash_phi(int thr_id, struct work* work, uint32_t max_nonce, u
 
 		quark_skein512_cpu_init(thr_id, throughput);
 		quark_jh512_cpu_init(thr_id, throughput);
-		//x11_cubehash512_cpu_init(thr_id, throughput);
+		x11_cubehash512_cpu_init(thr_id, throughput);
 		x13_fugue512_cpu_init(thr_id, throughput);
 		if (use_compat_kernels[thr_id])
 			x11_echo512_cpu_init(thr_id, throughput);
@@ -143,8 +144,7 @@ extern "C" int scanhash_phi(int thr_id, struct work* work, uint32_t max_nonce, u
 
 		skein512_cpu_hash_80(thr_id, throughput, pdata[19], d_hash[thr_id], 1); order++;
 		quark_jh512_cpu_hash_64(thr_id, throughput, pdata[19], NULL, d_hash[thr_id], order++);
-		//x11_cubehash512_cpu_hash_64(thr_id, throughput, pdata[19], NULL, d_hash[thr_id], order++);
-		x11_cubehash512_cpu_hash_64(thr_id, throughput, d_hash[thr_id]); order++;
+		x11_cubehash512_cpu_hash_64(thr_id, throughput, pdata[19], NULL, d_hash[thr_id], order++);
 		x13_fugue512_cpu_hash_64(thr_id, throughput, pdata[19], NULL, d_hash[thr_id], order++);
 		if (use_compat_kernels[thr_id]) {
 			streebog_cpu_hash_64(thr_id, throughput, d_hash[thr_id]);
@@ -222,3 +222,4 @@ extern "C" void free_phi(int thr_id)
 
 	cudaDeviceSynchronize();
 }
+#endif

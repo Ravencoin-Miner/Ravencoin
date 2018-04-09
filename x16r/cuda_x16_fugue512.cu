@@ -1,6 +1,7 @@
 
 #include <stdio.h>
-#include <cuda_helper.h>
+//#include <cuda_helper.h>
+#include "cuda_helper_alexis.h"
 
 #define TPB 256
 
@@ -270,7 +271,7 @@ static const uint32_t mixtab0[] = {
 	CMIX36(S24, S25, S26, S28, S29, S30, S06, S07, S08); \
 	SMIX(S24, S25, S26, S27); \
 }
-
+/*
 #undef ROL8
 #ifdef __CUDA_ARCH__
 __device__ __forceinline__
@@ -290,7 +291,7 @@ uint32_t ROL16(const uint32_t a) {
 #define ROR8(u)  ROTR32(u, 8)
 #define ROL16(u) ROTL32(u,16)
 #endif
-
+*/
 //#define AS_UINT4(addr) *((uint4*)(addr))
 
 __constant__ static uint64_t c_PaddedMessage80[10];
@@ -446,7 +447,8 @@ void x16_fugue512_gpu_hash_80(const uint32_t threads, const uint32_t startNonce,
 __host__
 void x16_fugue512_cpu_init(int thr_id, uint32_t threads)
 {
-	texDef(0, mixTab0Tex, mixTab0m, mixtab0, sizeof(uint32_t)*256);
+	texDef(0, mixTab0Tex, mixTab0m, mixtab0, sizeof(uint32_t) * 256);
+//	texDef(0, mixTab0Tex, mixTab0m, mixtab0, sizeof(uint32_t) * 256);
 }
 
 __host__

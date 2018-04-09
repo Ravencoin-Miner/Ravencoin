@@ -7,7 +7,8 @@
 #include <stdint.h>
 #include <memory.h>
 
-#include "cuda_helper.h"
+//#include "cuda_helper.h"
+#include "cuda_helper_alexis.h"
 
 typedef unsigned char BitSequence;
 

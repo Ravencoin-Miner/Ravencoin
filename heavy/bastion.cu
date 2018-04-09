@@ -1,7 +1,7 @@
 /**
  * bastion cuda implemention tpruvot@github 2017
  */
-
+#if 0
 #include <stdio.h>
 #include <string.h>
 //#include <openssl/sha.h>
@@ -329,3 +329,4 @@ void bastionhash(void* output, const uchar* input)
 
 	memcpy(output, hash, 32);
 }
+#endif

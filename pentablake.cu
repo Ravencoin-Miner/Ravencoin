@@ -1,3 +1,4 @@
+#if 0
 /**
  * Penta Blake
  */
@@ -160,3 +161,4 @@ void free_pentablake(int thr_id)
 
 	init[thr_id] = false;
 }
+#endif

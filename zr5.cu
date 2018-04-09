@@ -1,5 +1,5 @@
 /* Ziftrcoin ZR5 CUDA Implementation, (c) tpruvot 2015 */
-
+#if 0
 extern "C" {
 #include "sph/sph_blake.h"
 #include "sph/sph_groestl.h"
@@ -323,7 +323,7 @@ extern void quark_groestl512_cpu_hash_64(int thr_id, uint32_t threads, uint32_t 
 extern void quark_groestl512_cpu_free(int thr_id);
 
 extern void quark_jh512_cpu_init(int thr_id, uint32_t threads);
-extern void quark_jh512_cpu_hash_64(int thr_id, uint32_t threads, uint32_t startNounce, uint32_t *d_nonceVector, uint32_t *d_hash, int order);
+extern void quark_jh512_cpu_hash_64(int thr_id, uint32_t threads, uint32_t *d_hash, int order);
 
 extern void quark_skein512_cpu_init(int thr_id, uint32_t threads);
 extern void quark_skein512_cpu_hash_64(int thr_id, uint32_t threads, uint32_t startNounce, uint32_t *d_nonceVector, uint32_t *d_hash, int order);
@@ -512,3 +512,4 @@ extern "C" void free_zr5(int thr_id)
 
 	cudaDeviceSynchronize();
 }
+#endif

@@ -3,7 +3,8 @@
 #include <sys/types.h> // off_t
 
 #include "miner.h"
-#include "cuda_helper.h"
+//#include "cuda_helper.h"
+#include "cuda_helper_alexis.h"
 
 #define ROTR(x,n) ROTR64(x,n)
 
@@ -115,7 +116,7 @@ void quark_blake512_compress(uint64_t *h, const uint64_t *block, const uint8_t (
 }
 
 __global__ __launch_bounds__(256, 4)
-void quark_blake512_gpu_hash_64(uint32_t threads, uint32_t startNounce, uint32_t *g_nonceVector, uint64_t *g_hash)
+void quark_blake512_gpu_hash_64(uint32_t threads, uint64_t *g_hash)
 {
 #if !defined(SP_KERNEL) || __CUDA_ARCH__ < 500
 	uint32_t thread = (blockDim.x * blockIdx.x + threadIdx.x);
@@ -128,9 +129,9 @@ void quark_blake512_gpu_hash_64(uint32_t threads, uint32_t startNounce, uint32_t
 	if (thread < threads)
 #endif
 	{
-		uint32_t nounce = (g_nonceVector != NULL) ? g_nonceVector[thread] : (startNounce + thread);
+		//uint32_t nounce = (g_nonceVector != NULL) ? g_nonceVector[thread] : (startNounce + thread);
 
-		off_t hashPosition = nounce - startNounce;
+		off_t hashPosition = thread;//= nounce - startNounce;
 		uint64_t *inpHash = &g_hash[hashPosition<<3]; // hashPosition * 8
 
 		// 128 Bytes
@@ -234,19 +235,19 @@ void quark_blake512_gpu_hash_80(uint32_t threads, uint32_t startNounce, void *ou
 #endif
 
 __host__
-void quark_blake512_cpu_hash_64(int thr_id, uint32_t threads, uint32_t startNounce, uint32_t *d_nonceVector, uint32_t *d_outputHash, int order)
+void quark_blake512_cpu_hash_64(int thr_id, uint32_t threads, uint32_t *d_outputHash)
 {
 #ifdef SP_KERNEL
 	int dev_id = device_map[thr_id];
 	if (device_sm[dev_id] >= 500 && cuda_arch[dev_id] >= 500)
-		quark_blake512_cpu_hash_64_sp(threads, startNounce, d_nonceVector, d_outputHash);
+		quark_blake512_cpu_hash_64_sp(threads, d_outputHash);
 	else
 #endif
 	{
 		const uint32_t threadsperblock = 256;
 		dim3 grid((threads + threadsperblock-1)/threadsperblock);
 		dim3 block(threadsperblock);
-		quark_blake512_gpu_hash_64<<<grid, block>>>(threads, startNounce, d_nonceVector, (uint64_t*)d_outputHash);
+		quark_blake512_gpu_hash_64<<<grid, block>>>(threads, (uint64_t*)d_outputHash);
 	}
 	//MyStreamSynchronize(NULL, order, thr_id);
 }

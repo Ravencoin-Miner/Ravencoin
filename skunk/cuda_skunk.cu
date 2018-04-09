@@ -1,3 +1,4 @@
+#if 0
 /**
  * skein + cube + fugue merged kernel, based on krnlx work
  *
@@ -699,3 +700,4 @@ void skunk_cpu_init(int thr_id, uint32_t threads)
 	cuda_get_arch(thr_id);
 }
 
+#endif
