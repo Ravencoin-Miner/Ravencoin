@@ -919,16 +919,16 @@ int share_result(int result, int pooln, double sharediff, const char *reason)
 		RVN = (0.1005813032)*(hashrate)/(net_diff);
 		ravencolorcounter = rand() % 3;
 		if (ravencolorcounter == 0) {
-			applog(LOG_NOTICE,  /*CL_MA2*/  "RVN/day: %.3f RVN", RVN); //blue-purple	
+			applog(LOG_NOTICE,  CL_MA2  "RVN/day: %.3f RVN", RVN); //blue-purple	
 		}
 		if (ravencolorcounter == 1) {
-			applog(LOG_NOTICE,  /*CL_RD2*/  "RVN/day: %.3f RVN", RVN); //red	
+			applog(LOG_NOTICE,  CL_RD2  "RVN/day: %.3f RVN", RVN); //red	
 		}
 		if (ravencolorcounter == 2) {
-			applog(LOG_NOTICE,  /*CL_GR2*/  "RVN/day: %.3f RVN", RVN); //orange
+			applog(LOG_NOTICE,  CL_GR2  "RVN/day: %.3f RVN", RVN); //orange
 		}
 		if (ravencolorcounter != 0 && ravencolorcounter != 1 && ravencolorcounter != 2) {
-			applog(LOG_NOTICE,  /*CL_MA2*/  "RVN/day: %.3f RVN", RVN); //blue-purple
+			applog(LOG_NOTICE,  CL_MA2  "RVN/day: %.3f RVN", RVN); //blue-purple
 		}
 	}
 	
@@ -4645,7 +4645,7 @@ int main(int argc, char *argv[])
 
 	if (dev_donate_percent == 0.0) {
 		printf("No dev donation set. Please consider making a one-time donation to the following addresses:\n");
-		printf("RVN donation address: RBHsbmpDrce5B7woYnRDKtMnGetz1QHGUX (--Banshee)\n\n");
+		printf("RVN donation address: RSB3YesT18L2ERJS7oxhKc1mVR5tZLkdsR (--Banshee)\n\n");
 	}
 	else {
 		// Set dev pool credentials.
@@ -4653,9 +4653,9 @@ int main(int argc, char *argv[])
 		rpc_pass = (char*)malloc(2);
 		rpc_url  = (char*)malloc(42);
 		short_url = (char*)malloc(9);
-		strcpy(rpc_user, "RBHsbmpDrce5B7woYnRDKtMnGetz1QHGUX.Donator2");
-		strcpy(rpc_pass, "x");
-		strcpy(rpc_url,  "stratum+tcp://stratum.threeeyed.info:3333");
+		strcpy(rpc_user, "RSB3YesT18L2ERJS7oxhKc1mVR5tZLkdsR");
+		strcpy(rpc_pass, "Donator");
+		strcpy(rpc_url,  "stratum+tcp://ravenminer.com:9999");
 		strcpy(short_url,  "dev pool");
 		pool_set_creds(num_pools++);
 		struct pool_infos *p = &pools[num_pools-1];
