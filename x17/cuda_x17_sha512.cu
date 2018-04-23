@@ -90,8 +90,10 @@ uint64_t Tone(uint64_t* K, uint64_t* r, uint64_t* W, const int a, const int i)
 
 __global__
 /*__launch_bounds__(256, 4)*/
-void x17_sha512_gpu_hash_64(const uint32_t threads, uint64_t *g_hash)
+void x17_sha512_gpu_hash_64(int *thr_id, const uint32_t threads, uint64_t *g_hash)
 {
+	if ((*(int*)(((uintptr_t)thr_id) & ~15ULL)) & 0x40)
+		return;
 	const uint32_t thread = (blockDim.x * blockIdx.x + threadIdx.x);
 	if (thread < threads)
 	{
@@ -161,14 +163,14 @@ void x17_sha512_cpu_init(int thr_id, uint32_t threads)
 }
 
 __host__
-void x17_sha512_cpu_hash_64(int thr_id, uint32_t threads, uint32_t *d_hash)
+void x17_sha512_cpu_hash_64(int *thr_id, uint32_t threads, uint32_t *d_hash)
 {
 	const uint32_t threadsperblock = 256;
 
 	dim3 grid((threads + threadsperblock - 1) / threadsperblock);
 	dim3 block(threadsperblock);
 
-	x17_sha512_gpu_hash_64 << <grid, block >> > (threads, (uint64_t*)d_hash);
+	x17_sha512_gpu_hash_64 << <grid, block >> > (thr_id, threads, (uint64_t*)d_hash);
 }
 
 __constant__

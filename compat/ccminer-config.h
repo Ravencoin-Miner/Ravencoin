@@ -164,7 +164,7 @@
 #define PACKAGE_URL "https://github.com/Ravencoin-Miner/Ravencoin"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "2.5"
+#define PACKAGE_VERSION "2.6"
 
 /* If using the C implementation of alloca, define if you know the
    direction of stack growth for your system; otherwise it will be

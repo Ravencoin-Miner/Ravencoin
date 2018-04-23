@@ -335,7 +335,7 @@ void finalization512(hashState *state, uint32_t *b)
 
 /***************************************************/
 // Die Hash-Funktion
-__global__ void x11_luffa512_gpu_hash_64(uint32_t threads, uint32_t startNounce, uint64_t *g_hash, uint32_t *g_nonceVector)
+__global__ void x11_luffa512_gpu_hash_64(int *thr_id, uint32_t threads, uint32_t startNounce, uint64_t *g_hash, uint32_t *g_nonceVector)
 {
     uint32_t thread = (blockDim.x * blockIdx.x + threadIdx.x);
     if (thread < threads)
@@ -364,7 +364,7 @@ void x11_luffa512_cpu_init(int thr_id, uint32_t threads)
     CUDA_CALL_OR_RET(cudaMemcpyToSymbol(c_CNS, h_CNS, sizeof(h_CNS), 0, cudaMemcpyHostToDevice));
 }
 
-__host__ void x11_luffa512_cpu_hash_64(int thr_id, uint32_t threads, uint32_t startNounce, uint32_t *d_nonceVector, uint32_t *d_hash, int order)
+__host__ void x11_luffa512_cpu_hash_64(int *thr_id, uint32_t threads, uint32_t startNounce, uint32_t *d_nonceVector, uint32_t *d_hash, int order)
 {
     const uint32_t threadsperblock = 256;
 
@@ -375,7 +375,7 @@ __host__ void x11_luffa512_cpu_hash_64(int thr_id, uint32_t threads, uint32_t st
     // Größe des dynamischen Shared Memory Bereichs
     size_t shared_size = 0;
 
-    x11_luffa512_gpu_hash_64<<<grid, block, shared_size>>>(threads, startNounce, (uint64_t*)d_hash, d_nonceVector);
+	x11_luffa512_gpu_hash_64 << <grid, block, shared_size >> >(thr_id, threads, startNounce, (uint64_t*)d_hash, d_nonceVector);
     //MyStreamSynchronize(NULL, order, thr_id);
 }
 

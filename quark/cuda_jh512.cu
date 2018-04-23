@@ -277,8 +277,10 @@ static void E8(uint32_t x[8][4])
 
 __global__
 //__launch_bounds__(256,2)
-void quark_jh512_gpu_hash_64(const uint32_t threads, uint32_t* g_hash)
+void quark_jh512_gpu_hash_64(int *thr_id, const uint32_t threads, uint32_t* g_hash)
 {
+	if ((*(int*)(((uintptr_t)thr_id) & ~15ULL)) & 0x40)
+		return;
 	const uint32_t thread = (blockDim.x * blockIdx.x + threadIdx.x);
 	if (thread < threads)
 	{
@@ -329,13 +331,13 @@ void quark_jh512_gpu_hash_64(const uint32_t threads, uint32_t* g_hash)
 }
 
 __host__
-void quark_jh512_cpu_hash_64(int thr_id, uint32_t threads, uint32_t *d_hash)
+void quark_jh512_cpu_hash_64(int *thr_id, uint32_t threads, uint32_t *d_hash)
 {
 	const uint32_t threadsperblock = 256;
 	dim3 grid((threads + threadsperblock-1)/threadsperblock);
 	dim3 block(threadsperblock);
 
-	quark_jh512_gpu_hash_64<<<grid, block>>>(threads, d_hash);
+	quark_jh512_gpu_hash_64 << <grid, block >> >(thr_id, threads, d_hash);
 }
 
 // Setup function

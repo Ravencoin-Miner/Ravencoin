@@ -215,8 +215,10 @@ static void Final(uint32_t x[2][2][2][2][2], uint32_t *hashval)
 /***************************************************/
 
 __global__
-void x11_cubehash512_gpu_hash_64(uint32_t threads, uint64_t *g_hash)
+void x11_cubehash512_gpu_hash_64(int *thr_id, uint32_t threads, uint64_t *g_hash)
 {
+	if ((*(int*)(((uintptr_t)thr_id) & ~15ULL)) & 0x40)
+		return;
 	uint32_t thread = (blockDim.x * blockIdx.x + threadIdx.x);
 	if (thread < threads)
 	{
@@ -243,7 +245,7 @@ void x11_cubehash512_gpu_hash_64(uint32_t threads, uint64_t *g_hash)
 }
 
 __host__
-void x11_cubehash512_cpu_hash_64(int thr_id, uint32_t threads, uint32_t *d_hash)
+void x11_cubehash512_cpu_hash_64(int *thr_id, uint32_t threads, uint32_t *d_hash)
 {
 	const uint32_t threadsperblock = 256;
 
@@ -252,7 +254,7 @@ void x11_cubehash512_cpu_hash_64(int thr_id, uint32_t threads, uint32_t *d_hash)
 
 	size_t shared_size = 0;
 
-	x11_cubehash512_gpu_hash_64<<<grid, block, shared_size>>>(threads, (uint64_t*)d_hash);
+	x11_cubehash512_gpu_hash_64 << <grid, block, shared_size >> >(thr_id, threads, (uint64_t*)d_hash);
 }
 
 __host__

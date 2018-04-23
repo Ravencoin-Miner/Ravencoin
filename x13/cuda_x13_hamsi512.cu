@@ -318,7 +318,7 @@ static const uint32_t T512[64][16] = {
 };
 
 __global__
-void x13_hamsi512_gpu_hash_64(uint32_t threads, uint32_t startNounce, uint64_t *g_hash, uint32_t *g_nonceVector)
+void x13_hamsi512_gpu_hash_64(int *thr_id, uint32_t threads, uint32_t startNounce, uint64_t *g_hash, uint32_t *g_nonceVector)
 {
 	uint32_t thread = (blockDim.x * blockIdx.x + threadIdx.x);
 	if (thread < threads)
@@ -416,14 +416,14 @@ void x13_hamsi512_cpu_init(int thr_id, uint32_t threads)
 }
 
 __host__
-void x13_hamsi512_cpu_hash_64(int thr_id, uint32_t threads, uint32_t startNounce, uint32_t *d_nonceVector, uint32_t *d_hash)
+void x13_hamsi512_cpu_hash_64(int *thr_id, uint32_t threads, uint32_t startNounce, uint32_t *d_nonceVector, uint32_t *d_hash, int order)
 {
 	const uint32_t threadsperblock = 128;
 
 	dim3 grid((threads + threadsperblock-1)/threadsperblock);
 	dim3 block(threadsperblock);
 
-	x13_hamsi512_gpu_hash_64<<<grid, block>>>(threads, startNounce, (uint64_t*)d_hash, d_nonceVector);
+	x13_hamsi512_gpu_hash_64<<<grid, block>>>(thr_id, threads, startNounce, (uint64_t*)d_hash, d_nonceVector);
 	//MyStreamSynchronize(NULL, order, thr_id);
 }
 

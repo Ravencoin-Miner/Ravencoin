@@ -36,9 +36,10 @@ __constant__ static uint32_t c_Message80[20];
 
 __global__ __launch_bounds__(TPB, THF)
 //const uint32_t startNounce, 
-void quark_groestl512_gpu_hash_64_quad_a1_min3r(const uint32_t threads, uint4* g_hash)
+void quark_groestl512_gpu_hash_64_quad_a1_min3r(int *thr_id, const uint32_t threads, uint4* g_hash)
 {
-
+	if ((*(int*)(((uintptr_t)thr_id) & ~15ULL)) & 0x40)
+		return;
 #if __CUDA_ARCH__ >= 300
 	// BEWARE : 4-WAY CODE (one hash need 4 threads)
 	const uint32_t thread = (blockDim.x * blockIdx.x + threadIdx.x); // >> 2; // done on cpu
@@ -70,7 +71,7 @@ void quark_groestl512_gpu_hash_64_quad_a1_min3r(const uint32_t threads, uint4* g
 		message[0].y = ((uint32_t*)&pHash[1])[thr];
 		message[0].z = ((uint32_t*)&pHash[2])[thr];
 		message[0].w = ((uint32_t*)&pHash[3])[thr];
-		__syncthreads();
+//		__syncthreads();
 
 //#pragma unroll
 //		for (int k = 0; k<4; k++) message[k] = pHash[thr + (k * THF)];
@@ -186,7 +187,7 @@ void quark_groestl512_gpu_hash_64_quad_a1_min3r(const uint32_t threads, uint4* g
 }
 
 __global__ __launch_bounds__(TPB, THF)
-void quark_groestl512_gpu_hash_64_quad(const uint32_t threads, const uint32_t startNounce, uint32_t * g_hash, uint32_t * __restrict g_nonceVector)
+void quark_groestl512_gpu_hash_64_quad(int *thr_id, const uint32_t threads, const uint32_t startNounce, uint32_t * g_hash, uint32_t * __restrict g_nonceVector)
 {
 	//! fixme please
 #if 0 // __CUDA_ARCH__ >= 300
@@ -262,7 +263,7 @@ void quark_groestl512_cpu_free(int thr_id)
 }
 
 __host__
-void quark_groestl512_cpu_hash_64(int thr_id, uint32_t threads, uint32_t *d_hash)
+void quark_groestl512_cpu_hash_64(int *thr_id, uint32_t threads, uint32_t *d_hash)
 {
 	uint32_t threadsperblock = TPB;
 	// Compute 3.0 benutzt die registeroptimierte Quad Variante mit Warp Shuffle
@@ -277,7 +278,7 @@ void quark_groestl512_cpu_hash_64(int thr_id, uint32_t threads, uint32_t *d_hash
 
 //	if (device_sm[dev_id] >= 300 && cuda_arch[dev_id] >= 300)// && order == -1) //! for x16r, TBD if it will work on other algos.
 //	{
-		quark_groestl512_gpu_hash_64_quad_a1_min3r <<<grid, block >>>(threads << 2, (uint4*)d_hash);
+	quark_groestl512_gpu_hash_64_quad_a1_min3r << <grid, block >> >(thr_id, threads << 2, (uint4*)d_hash);
 //	}
 	/*
 	else 

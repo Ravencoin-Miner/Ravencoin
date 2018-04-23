@@ -301,7 +301,7 @@ void x11_echo512_gpu_hash_64(uint32_t threads, uint32_t startNounce, uint64_t *g
 }
 
 __host__
-void x11_echo512_cpu_init(int thr_id, uint32_t threads)
+void X11_echo512_cpu_init(int thr_id, uint32_t threads)
 {
 	aes_cpu_init(thr_id);
 }

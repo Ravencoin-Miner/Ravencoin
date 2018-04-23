@@ -1,4 +1,4 @@
-AC_INIT([Ravencoin Miner], [2.2], [], [Ravencoin Miner], [https://github.com/Ravencoin-Miner/Ravencoin])
+AC_INIT([Ravencoin Miner], [2.6], [], [Ravencoin Miner], [https://github.com/Ravencoin-Miner/Ravencoin])
 
 AC_PREREQ([2.59c])
 AC_CANONICAL_SYSTEM

@@ -243,8 +243,10 @@ static void SMIX_LDG(const uint32_t shared[4][256], uint32_t &x0,uint32_t &x1,ui
 /***************************************************/
 // Die Hash-Funktion
 __global__ __launch_bounds__(256,3)
-void x13_fugue512_gpu_hash_64_alexis(uint32_t threads, uint64_t *g_hash)
+void x13_fugue512_gpu_hash_64_alexis(int *thr_id, uint32_t threads, uint64_t *g_hash)
 {
+	if ((*(int*)(((uintptr_t)thr_id) & ~15ULL)) & 0x40)
+		return;
 	__shared__ uint32_t shared[4][256];
 
 //	if(threadIdx.x<256){
@@ -254,7 +256,7 @@ void x13_fugue512_gpu_hash_64_alexis(uint32_t threads, uint64_t *g_hash)
 		shared[2][threadIdx.x] = ROL16(tmp);
 		shared[3][threadIdx.x] = ROL8(tmp);
 //	}
-	__syncthreads();
+//	__syncthreads();
 	const uint32_t thread = (blockDim.x * blockIdx.x + threadIdx.x);
 	if (thread < threads)
 	{
@@ -406,15 +408,15 @@ void x13_fugue512_gpu_hash_64_final_alexis(uint32_t threads,const uint32_t* __re
 }
 
 __host__
-void x13_fugue512_cpu_hash_64_alexis(int thr_id, uint32_t threads, uint32_t *d_hash){
-
+void x13_fugue512_cpu_hash_64_alexis(int *thr_id, uint32_t threads, uint32_t *d_hash)
+{
 	const uint32_t threadsperblock = 256;
 
 	// berechne wie viele Thread Blocks wir brauchen
 	dim3 grid((threads + threadsperblock-1)/threadsperblock);
 	dim3 block(threadsperblock);
 
-	x13_fugue512_gpu_hash_64_alexis<<<grid, block>>>(threads, (uint64_t*)d_hash);
+	x13_fugue512_gpu_hash_64_alexis<<<grid, block>>>(thr_id, threads, (uint64_t*)d_hash);
 }
 
 __host__

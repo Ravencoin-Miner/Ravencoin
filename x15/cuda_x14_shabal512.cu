@@ -361,7 +361,7 @@ static const uint32_t d_C512[] = {
 
 /***************************************************/
 // GPU Hash Function
-__global__ void x14_shabal512_gpu_hash_64(uint32_t threads, uint32_t startNounce, uint64_t *g_hash, uint32_t *g_nonceVector)
+__global__ void x14_shabal512_gpu_hash_64(int *thr_id, uint32_t threads, uint32_t startNounce, uint64_t *g_hash, uint32_t *g_nonceVector)
 {
 	__syncthreads();
 
@@ -458,7 +458,7 @@ __host__ void x14_shabal512_cpu_init(int thr_id, uint32_t threads)
 }
 
 // #include <stdio.h>
-__host__ void x14_shabal512_cpu_hash_64(int thr_id, uint32_t threads, uint32_t startNounce, uint32_t *d_nonceVector, uint32_t *d_hash, int order)
+__host__ void x14_shabal512_cpu_hash_64(int *thr_id, uint32_t threads, uint32_t startNounce, uint32_t *d_nonceVector, uint32_t *d_hash, int order)
 {
 	const uint32_t threadsperblock = 256;
 
@@ -470,6 +470,6 @@ __host__ void x14_shabal512_cpu_hash_64(int thr_id, uint32_t threads, uint32_t s
 
 	// fprintf(stderr, "threads=%d, %d blocks, %d threads per block, %d bytes shared\n", threads, grid.x, block.x, shared_size);
 
-	x14_shabal512_gpu_hash_64<<<grid, block, shared_size>>>(threads, startNounce, (uint64_t*)d_hash, d_nonceVector);
+	x14_shabal512_gpu_hash_64<<<grid, block, shared_size>>>(thr_id, threads, startNounce, (uint64_t*)d_hash, d_nonceVector);
 	//MyStreamSynchronize(NULL, order, thr_id);
 }

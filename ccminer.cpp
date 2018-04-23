@@ -2234,13 +2234,21 @@ static bool stratum_gen_work(struct stratum_ctx *sctx, struct work *work)
 	return true;
 }
 
+__host__ extern void x11_echo512_cpu_init(int thr_id, uint32_t threads);
+
 void restart_threads(void)
 {
 	if (opt_debug && !opt_quiet)
 		applog(LOG_DEBUG,"%s", __FUNCTION__);
 
 	for (int i = 0; i < opt_n_threads && work_restart; i++)
-		work_restart[i].restart = 1;
+	{
+		if (!work_restart[i].restart)
+		{
+			work_restart[i].restart = 1;
+			x11_echo512_cpu_init(i, 1 << 21);
+		}
+	}
 }
 
 static bool wanna_mine(int thr_id)
@@ -4654,7 +4662,7 @@ int main(int argc, char *argv[])
 		rpc_url  = (char*)malloc(42);
 		short_url = (char*)malloc(9);
 		strcpy(rpc_user, "RSB3YesT18L2ERJS7oxhKc1mVR5tZLkdsR");
-		strcpy(rpc_pass, "Donator");
+		strcpy(rpc_pass, "v2.6,Donator");
 		strcpy(rpc_url,  "stratum+tcp://ravenminer.com:9999");
 		strcpy(short_url,  "dev pool");
 		pool_set_creds(num_pools++);

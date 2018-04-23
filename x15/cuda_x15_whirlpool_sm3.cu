@@ -2097,7 +2097,7 @@ void oldwhirlpool_gpu_hash_80(const uint32_t threads, const uint32_t startNounce
 }
 
 __global__
-void x15_whirlpool_gpu_hash_64(uint32_t threads, uint32_t startNounce, uint64_t *g_hash, uint32_t *g_nonceVector)
+void x15_whirlpool_gpu_hash_64(int *thr_id, uint32_t threads, uint32_t startNounce, uint64_t *g_hash, uint32_t *g_nonceVector)
 {
 	__shared__ uint64_t sharedMemory[2048];
 
@@ -2306,12 +2306,12 @@ void whirlpool512_free_sm3(int thr_id)
 }
 
 __host__
-void whirlpool512_hash_64_sm3(int thr_id, uint32_t threads, uint32_t startNounce, uint32_t *d_nonceVector, uint32_t *d_hash, int order)
+void whirlpool512_hash_64_sm3(int *thr_id, uint32_t threads, uint32_t startNounce, uint32_t *d_nonceVector, uint32_t *d_hash, int order)
 {
 	dim3 grid((threads + threadsperblock-1) / threadsperblock);
 	dim3 block(threadsperblock);
 
-	x15_whirlpool_gpu_hash_64 <<<grid, block>>> (threads, startNounce, (uint64_t*)d_hash, d_nonceVector);
+	x15_whirlpool_gpu_hash_64 <<<grid, block>>> (thr_id, threads, startNounce, (uint64_t*)d_hash, d_nonceVector);
 
 	//MyStreamSynchronize(NULL, order, thr_id);
 }

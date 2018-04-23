@@ -280,8 +280,10 @@ void x11_echo512_cpu_hash_64_final_alexis(int thr_id, uint32_t threads, uint32_t
 }
 
 __global__ __launch_bounds__(128, 5) /* will force 80 registers */
-static void x11_echo512_gpu_hash_64_alexis(uint32_t threads, uint32_t *g_hash)
+static void x11_echo512_gpu_hash_64_alexis(int *thr_id, uint32_t threads, uint32_t *g_hash)
 {
+	if ((*(int*)(((uintptr_t)thr_id) & ~15ULL)) & 0x40)
+		return;
 	__shared__ uint32_t sharedMemory[4][256];
 
 	aes_gpu_init128(sharedMemory);
@@ -439,12 +441,12 @@ static void x11_echo512_gpu_hash_64_alexis(uint32_t threads, uint32_t *g_hash)
 }
 
 __host__
-void x11_echo512_cpu_hash_64_alexis(int thr_id, uint32_t threads, uint32_t *d_hash){
+void x11_echo512_cpu_hash_64_alexis(int *thr_id, uint32_t threads, uint32_t *d_hash){
 
 	const uint32_t threadsperblock = 128;
 
 	dim3 grid((threads + threadsperblock-1)/threadsperblock);
 	dim3 block(threadsperblock);
 
-	x11_echo512_gpu_hash_64_alexis<<<grid, block>>>(threads, d_hash);
+	x11_echo512_gpu_hash_64_alexis << <grid, block >> >(thr_id, threads, d_hash);
 }

@@ -2,7 +2,7 @@
 
 Kraww!
 
-An optimized fork of ccminer developed specially for x16r.
+An optimized fork of ccminer developed for Ravencoin.
 
 Based on Christian Buchner's &amp; Christian H.'s CUDA project, no longer active on github since 2014.
 
@@ -16,16 +16,20 @@ This is the example .bat file provided with the miner. Feel free to use this or 
 	:: Kraww!
 	:: Set the developer donation percent with --donate. Minimum donation is 0%.
 	:MINE
-	ccminer -a x16r -o stratum+tcp://stratum.threeeyed.info:3333 -u RBHsbmpDrce5B7woYnRDKtMnGetz1QHGUX -p x -i 20 --donate 1 -r 5 -N 600
-	ccminer -a x16r -o stratum+tcp://stratum.threeeyed.info:3333 -u RBHsbmpDrce5B7woYnRDKtMnGetz1QHGUX -p x -i 20 --donate 1 -r 3 -N 600
-	ccminer -a x16r -o stratum+tcp://stratum.threeeyed.info:3333 -u RBHsbmpDrce5B7woYnRDKtMnGetz1QHGUX -p x -i 20 --donate 1 -r 3 -N 600
-	ccminer -a x16r -o stratum+tcp://stratum.threeeyed.info:3333 -u RBHsbmpDrce5B7woYnRDKtMnGetz1QHGUX -p x -i 20 --donate 1 -r 3 -N 600
+	ccminer -a x16r -o stratum+tcp://ravenminer.com:3636 -u RSB3YesT18L2ERJS7oxhKc1mVR5tZLkdsR -p d=8 -i 20 --donate 1 -r 5 -N 600
+	ccminer -a x16r -o stratum+tcp://ravenminer.com:3636 -u RSB3YesT18L2ERJS7oxhKc1mVR5tZLkdsR -p d=8 -i 20 --donate 1 -r 3 -N 600
+	ccminer -a x16r -o stratum+tcp://ravenminer.com:3636 -u RSB3YesT18L2ERJS7oxhKc1mVR5tZLkdsR -p d=8 -i 20 --donate 1 -r 3 -N 600
+	ccminer -a x16r -o stratum+tcp://ravenminer.com:3636 -u RSB3YesT18L2ERJS7oxhKc1mVR5tZLkdsR -p d=8 -i 20 --donate 1 -r 3 -N 600
 	GOTO :MINE
 
 - Replace the pool connection information with your preferred Ravencoin pool
 - Replace the wallet address with your own
 - Most Ravencoin pools can have anything after -p, generally it is used as a worker name
-- Set Intensity with -i, default is 20
+- Set Stratum difficulty with d=X
+- Recommended difficulty setting:
+	- d=HASHRATE/2
+	- d=HASHRATE/3
+- Set Intensity with -i, default is 19
 - Set Donation % with --donate
 - Set number of times miner will try to reconnect to pool before moving to next connection in script with -r
 - -N 600 Makes the mining program use 600 shares in the calculation of the average hash rate that is displayed on Accepted share lines
@@ -39,7 +43,7 @@ Consider supporting the contributors to this miner by donating to the following 
 
 --Banshee (developer of Ravencoin miner)
 
-- RVN: RBHsbmpDrce5B7woYnRDKtMnGetz1QHGUX
+- RVN: RSB3YesT18L2ERJS7oxhKc1mVR5tZLkdsR
 
 Built from source on Windows 10 x64
 

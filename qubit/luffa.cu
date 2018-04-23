@@ -1,3 +1,4 @@
+#if 0
 /*
  * luffa 80 algo (Introduced by Doomcoin)
  */
@@ -131,3 +132,4 @@ extern "C" void free_luffa(int thr_id)
 	init[thr_id] = false;
 	cudaDeviceSynchronize();
 }
+#endif

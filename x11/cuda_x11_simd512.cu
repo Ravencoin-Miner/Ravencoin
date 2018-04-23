@@ -3,7 +3,7 @@
  */
 
 #include "miner.h"
-#include "cuda_helper.h"
+#include "cuda_helper_alexis.h"
 
 #define TPB 128
 
@@ -585,8 +585,10 @@ void Expansion(const uint32_t *data, uint4 *g_temp4)
 /***************************************************/
 
 __global__ __launch_bounds__(TPB, 4)
-void x11_simd512_gpu_expand_64(uint32_t threads, uint32_t *g_hash, uint4 *g_temp4)
+void x11_simd512_gpu_expand_64(int *thr_id, uint32_t threads, uint32_t *g_hash, uint4 *g_temp4)
 {
+	if ((*(int*)(((uintptr_t)thr_id) & ~15ULL)) & 0x40)
+		return;
 	int threadBloc = (blockDim.x * blockIdx.x + threadIdx.x) / 8;
 	if (threadBloc < threads)
 	{
@@ -607,8 +609,11 @@ void x11_simd512_gpu_expand_64(uint32_t threads, uint32_t *g_hash, uint4 *g_temp
 }
 
 __global__ __launch_bounds__(TPB, 1)
-void x11_simd512_gpu_compress1_64(uint32_t threads, uint32_t *g_hash, uint4 *g_fft4, uint32_t *g_state)
+void x11_simd512_gpu_compress1_64(int *thr_id, uint32_t threads, uint32_t *g_hash, uint4 *g_fft4, uint32_t *g_state)
 {
+	if ((*(int*)(((uintptr_t)thr_id) & ~15ULL)) & 0x40)
+		return;
+
 	uint32_t thread = (blockDim.x * blockIdx.x + threadIdx.x);
 	if (thread < threads)
 	{
@@ -618,8 +623,11 @@ void x11_simd512_gpu_compress1_64(uint32_t threads, uint32_t *g_hash, uint4 *g_f
 }
 
 __global__ __launch_bounds__(TPB, 1)
-void x11_simd512_gpu_compress2_64(uint32_t threads, uint4 *g_fft4, uint32_t *g_state)
+void x11_simd512_gpu_compress2_64(int *thr_id, uint32_t threads, uint4 *g_fft4, uint32_t *g_state)
 {
+	if ((*(int*)(((uintptr_t)thr_id) & ~15ULL)) & 0x40)
+		return;
+
 	uint32_t thread = (blockDim.x * blockIdx.x + threadIdx.x);
 	if (thread < threads)
 	{
@@ -628,8 +636,11 @@ void x11_simd512_gpu_compress2_64(uint32_t threads, uint4 *g_fft4, uint32_t *g_s
 }
 
 __global__ __launch_bounds__(TPB, 2)
-void x11_simd512_gpu_compress_64_maxwell(uint32_t threads, uint32_t *g_hash, uint4 *g_fft4, uint32_t *g_state)
+void x11_simd512_gpu_compress_64_maxwell(int *thr_id, uint32_t threads, uint32_t *g_hash, uint4 *g_fft4, uint32_t *g_state)
 {
+	if ((*(int*)(((uintptr_t)thr_id) & ~15ULL)) & 0x40)
+		return;
+
 	uint32_t thread = (blockDim.x * blockIdx.x + threadIdx.x);
 	if (thread < threads)
 	{
@@ -640,8 +651,11 @@ void x11_simd512_gpu_compress_64_maxwell(uint32_t threads, uint32_t *g_hash, uin
 }
 
 __global__ __launch_bounds__(TPB, 2)
-void x11_simd512_gpu_final_64(uint32_t threads, uint32_t *g_hash, uint4 *g_fft4, uint32_t *g_state)
+void x11_simd512_gpu_final_64(int *thr_id, uint32_t threads, uint32_t *g_hash, uint4 *g_fft4, uint32_t *g_state)
 {
+	if ((*(int*)(((uintptr_t)thr_id) & ~15ULL)) & 0x40)
+		return;
+
 	uint32_t thread = (blockDim.x * blockIdx.x + threadIdx.x);
 	if (thread < threads)
 	{
@@ -651,11 +665,11 @@ void x11_simd512_gpu_final_64(uint32_t threads, uint32_t *g_hash, uint4 *g_fft4,
 }
 
 #else
-__global__ void x11_simd512_gpu_expand_64(uint32_t threads, uint32_t *g_hash, uint4 *g_temp4) {}
-__global__ void x11_simd512_gpu_compress1_64(uint32_t threads, uint32_t *g_hash, uint4 *g_fft4, uint32_t *g_state) {}
-__global__ void x11_simd512_gpu_compress2_64(uint32_t threads, uint4 *g_fft4, uint32_t *g_state) {}
-__global__ void x11_simd512_gpu_compress_64_maxwell(uint32_t threads, uint32_t *g_hash, uint4 *g_fft4, uint32_t *g_state) {}
-__global__ void x11_simd512_gpu_final_64(uint32_t threads, uint32_t *g_hash, uint4 *g_fft4, uint32_t *g_state) {}
+__global__ void x11_simd512_gpu_expand_64(int *thr_id, uint32_t threads, uint32_t *g_hash, uint4 *g_temp4) {}
+__global__ void x11_simd512_gpu_compress1_64(int *thr_id, uint32_t threads, uint32_t *g_hash, uint4 *g_fft4, uint32_t *g_state) {}
+__global__ void x11_simd512_gpu_compress2_64(int *thr_id, uint32_t threads, uint4 *g_fft4, uint32_t *g_state) {}
+__global__ void x11_simd512_gpu_compress_64_maxwell(int *thr_id, uint32_t threads, uint32_t *g_hash, uint4 *g_fft4, uint32_t *g_state) {}
+__global__ void x11_simd512_gpu_final_64(int *thr_id, uint32_t threads, uint32_t *g_hash, uint4 *g_fft4, uint32_t *g_state) {}
 #endif /* SM3+ */
 
 __host__
@@ -713,25 +727,25 @@ void x11_simd512_cpu_free(int thr_id)
 }
 
 __host__
-void x11_simd512_cpu_hash_64(int thr_id, uint32_t threads, uint32_t *d_hash)
+void x11_simd512_cpu_hash_64(int *thr_id, uint32_t threads, uint32_t *d_hash)
 {
 	const uint32_t threadsperblock = TPB;
-	int dev_id = device_map[thr_id];
+	int dev_id = device_map[((uintptr_t)thr_id) & 15];
 	//2097152
 	dim3 block(threadsperblock);
 	dim3 grid((threads + threadsperblock-1) / threadsperblock);
 	dim3 gridX8(grid.x * 8);
 
-	x11_simd512_gpu_expand_64 <<<gridX8, block>>> (threads, d_hash, d_temp4[thr_id]);
+	x11_simd512_gpu_expand_64 << <gridX8, block >> > (thr_id, threads, d_hash, d_temp4[((uintptr_t)thr_id) & 15]);
 
 	if (device_sm[dev_id] >= 500 && cuda_arch[dev_id] >= 500) {
-		x11_simd512_gpu_compress_64_maxwell <<< grid, block >>> (threads, d_hash, d_temp4[thr_id], d_state[thr_id]);
+		x11_simd512_gpu_compress_64_maxwell << < grid, block >> > (thr_id, threads, d_hash, d_temp4[((uintptr_t)thr_id) & 15], d_state[((uintptr_t)thr_id) & 15]);
 	} else {
-		x11_simd512_gpu_compress1_64 <<< grid, block >>> (threads, d_hash, d_temp4[thr_id], d_state[thr_id]);
-		x11_simd512_gpu_compress2_64 <<< grid, block >>> (threads, d_temp4[thr_id], d_state[thr_id]);
+		x11_simd512_gpu_compress1_64 << < grid, block >> > (thr_id, threads, d_hash, d_temp4[((uintptr_t)thr_id) & 15], d_state[((uintptr_t)thr_id) & 15]);
+		x11_simd512_gpu_compress2_64 << < grid, block >> > (thr_id, threads, d_temp4[((uintptr_t)thr_id) & 15], d_state[((uintptr_t)thr_id) & 15]);
 	}
 
-	x11_simd512_gpu_final_64 <<<grid, block>>> (threads, d_hash, d_temp4[thr_id], d_state[thr_id]);
+	x11_simd512_gpu_final_64 << <grid, block >> > (thr_id, threads, d_hash, d_temp4[((uintptr_t)thr_id) & 15], d_state[((uintptr_t)thr_id) & 15]);
 
 //	MyStreamSynchronize(NULL, order, thr_id);
 }

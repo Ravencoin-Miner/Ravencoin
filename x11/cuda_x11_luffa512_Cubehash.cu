@@ -732,7 +732,7 @@ __global__
 #if __CUDA_ARCH__ > 500
 __launch_bounds__(256, 4)
 #endif
-void x11_luffaCubehash512_gpu_hash_64(uint32_t threads, uint32_t *g_hash)
+void x11_luffaCubehash512_gpu_hash_64(int *thr_id, uint32_t threads, uint32_t *g_hash)
 {
 	const uint32_t thread = (blockDim.x * blockIdx.x + threadIdx.x);
 	if (thread < threads)
@@ -817,15 +817,15 @@ void x11_luffaCubehash512_gpu_hash_64(uint32_t threads, uint32_t *g_hash)
 }
 
 __host__
-void x11_luffaCubehash512_cpu_hash_64(int thr_id, uint32_t threads, uint32_t *d_hash, int order)
+void x11_luffaCubehash512_cpu_hash_64(int *thr_id, uint32_t threads, uint32_t *d_hash, int order)
 {
 	const uint32_t threadsperblock = 256;
 
 	dim3 grid((threads + threadsperblock-1)/threadsperblock);
 	dim3 block(threadsperblock);
 
-	x11_luffaCubehash512_gpu_hash_64 <<<grid, block>>> (threads, d_hash);
-	MyStreamSynchronize(NULL, order, thr_id);
+	x11_luffaCubehash512_gpu_hash_64 <<<grid, block>>> (thr_id, threads, d_hash);
+	MyStreamSynchronize(NULL, order, ((uintptr_t)thr_id) & 15);
 }
 
 // Setup

@@ -157,8 +157,10 @@ void Compression512_30(uint64_t *msg, uint64_t *hash)
 }
 
 __global__
-void quark_bmw512_gpu_hash_64_30(uint32_t threads, uint64_t *g_hash)
+void quark_bmw512_gpu_hash_64_30(int *thr_id, uint32_t threads, uint64_t *g_hash)
 {
+	if ((*(int*)(((uintptr_t)thr_id) & ~15ULL)) & 0x40)
+		return;
 	int thread = (blockDim.x * blockIdx.x + threadIdx.x);
 	if (thread < threads)
 	{
@@ -265,7 +267,7 @@ void quark_bmw512_gpu_hash_80_30(uint32_t threads, uint32_t startNounce, uint64_
 }
 
 #else /* stripped stubs for other archs */
-__global__ void quark_bmw512_gpu_hash_64_30(uint32_t threads, uint64_t *g_hash) {}
+__global__ void quark_bmw512_gpu_hash_64_30(int *thr_id, uint32_t threads, uint64_t *g_hash) {}
 __global__ void quark_bmw512_gpu_hash_80_30(uint32_t threads, uint32_t startNounce, uint64_t *g_hash) {}
 #endif
 

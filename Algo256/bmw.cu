@@ -1,3 +1,4 @@
+#if 0
 /**
  * bmw-256 MDT
  * tpruvot - 2015
@@ -136,3 +137,4 @@ extern "C" void free_bmw(int thr_id)
 	cudaDeviceSynchronize();
 	init[thr_id] = false;
 }
+#endif

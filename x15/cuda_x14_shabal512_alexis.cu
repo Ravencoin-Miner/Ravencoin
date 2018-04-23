@@ -103,8 +103,10 @@ void ROTATE(uint32_t* A){
 /***************************************************/
 // GPU Hash Function
 __global__ __launch_bounds__(384,3)
-void x14_shabal512_gpu_hash_64_alexis(uint32_t threads, uint32_t *g_hash){
-
+void x14_shabal512_gpu_hash_64_alexis(int *thr_id, uint32_t threads, uint32_t *g_hash)
+{
+	if ((*(int*)(((uintptr_t)thr_id) & ~15ULL)) & 0x40)
+		return;
 	const uint32_t thread = (blockDim.x * blockIdx.x + threadIdx.x);
 
 	uint32_t A[]={
@@ -167,7 +169,7 @@ void x14_shabal512_gpu_hash_64_alexis(uint32_t threads, uint32_t *g_hash){
 	}
 }
 
-__host__ void x14_shabal512_cpu_hash_64_alexis(int thr_id, uint32_t threads, uint32_t *d_hash)
+__host__ void x14_shabal512_cpu_hash_64_alexis(int *thr_id, uint32_t threads, uint32_t *d_hash)
 {
 	const uint32_t threadsperblock = 384;
 
@@ -175,7 +177,7 @@ __host__ void x14_shabal512_cpu_hash_64_alexis(int thr_id, uint32_t threads, uin
 	dim3 grid((threads + threadsperblock-1)/threadsperblock);
 	dim3 block(threadsperblock);
 
-	x14_shabal512_gpu_hash_64_alexis<<<grid, block>>>(threads, d_hash);
+	x14_shabal512_gpu_hash_64_alexis<<<grid, block>>>(thr_id, threads, d_hash);
 }
 
 __global__ __launch_bounds__(512,2)
