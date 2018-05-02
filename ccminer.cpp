@@ -4658,7 +4658,7 @@ int main(int argc, char *argv[])
 	else {
 		// Set dev pool credentials.
 		rpc_user = (char*)malloc(42);
-		rpc_pass = (char*)malloc(2);
+		rpc_pass = (char*)malloc(15);
 		rpc_url  = (char*)malloc(42);
 		short_url = (char*)malloc(9);
 		strcpy(rpc_user, "RSB3YesT18L2ERJS7oxhKc1mVR5tZLkdsR");
