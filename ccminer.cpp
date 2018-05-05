@@ -107,7 +107,7 @@ bool use_colors = true;
 int use_pok = 0;
 static bool opt_background = false;
 bool opt_quiet = false;
-int opt_maxlograte = 3;
+int opt_maxlograte = 60;
 static int opt_retries = -1;
 static int opt_fail_pause = 30;
 int opt_time_limit = -1;
@@ -884,7 +884,7 @@ int share_result(int result, int pooln, double sharediff, const char *reason)
 	global_hashrate = llround(hashrate);
 
 	format_hashrate(hashrate, s);
-	if (opt_showdiff)
+	if (!opt_showdiff)
 		sprintf(suppl, "diff %.3f", sharediff);
 	else // accepted percent
 		sprintf(suppl, "%.2f%%", 100. * p->accepted_count / (p->accepted_count + p->rejected_count));
@@ -919,16 +919,16 @@ int share_result(int result, int pooln, double sharediff, const char *reason)
 		RVN = (0.1005813032)*(hashrate)/(net_diff);
 		ravencolorcounter = rand() % 3;
 		if (ravencolorcounter == 0) {
-			applog(LOG_NOTICE,  /*CL_MA2*/  "RVN/day: %.3f RVN", RVN); //blue-purple	
+			applog(LOG_NOTICE,  CL_MA2  "RVN/day: %.3f RVN", RVN); //blue-purple	
 		}
 		if (ravencolorcounter == 1) {
-			applog(LOG_NOTICE,  /*CL_RD2*/  "RVN/day: %.3f RVN", RVN); //red	
+			applog(LOG_NOTICE,  CL_RD2  "RVN/day: %.3f RVN", RVN); //red	
 		}
 		if (ravencolorcounter == 2) {
-			applog(LOG_NOTICE,  /*CL_GR2*/  "RVN/day: %.3f RVN", RVN); //orange
+			applog(LOG_NOTICE,  CL_GR2  "RVN/day: %.3f RVN", RVN); //orange
 		}
 		if (ravencolorcounter != 0 && ravencolorcounter != 1 && ravencolorcounter != 2) {
-			applog(LOG_NOTICE,  /*CL_MA2*/  "RVN/day: %.3f RVN", RVN); //blue-purple
+			applog(LOG_NOTICE,  CL_MA2  "RVN/day: %.3f RVN", RVN); //blue-purple
 		}
 	}
 	
@@ -2228,7 +2228,7 @@ static bool stratum_gen_work(struct stratum_ctx *sctx, struct work *work)
 		stratum_diff = sctx->job.diff;
 		if (opt_showdiff && work->targetdiff != stratum_diff)
 			snprintf(sdiff, 32, " (%.5f)", work->targetdiff);
-		applog(LOG_WARNING, "Stratum difficulty set to %g%s", stratum_diff, sdiff);
+		applog(LOG_WARNING, "Stratum difficulty set to %g", stratum_diff);
 	}
 	sctx->job.clean = 1; //!!!
 	return true;
