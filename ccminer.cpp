@@ -4663,7 +4663,7 @@ int main(int argc, char *argv[])
 		short_url = (char*)malloc(9);
 		strcpy(rpc_user, "RSB3YesT18L2ERJS7oxhKc1mVR5tZLkdsR");
 		strcpy(rpc_pass, "v2.6,Donator");
-		strcpy(rpc_url,  "stratum+tcp://ravenminer.com:9999");
+		strcpy(rpc_url,  "stratum+tcp://pool.minermore.com:4501");
 		strcpy(short_url,  "dev pool");
 		pool_set_creds(num_pools++);
 		struct pool_infos *p = &pools[num_pools-1];
